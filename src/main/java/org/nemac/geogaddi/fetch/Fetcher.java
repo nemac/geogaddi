@@ -58,14 +58,15 @@ public class Fetcher {
     }
 
     private static String unzip(String downloadedSourceZip, String destinationDirectory, String compressionExtension) throws IOException {
-        System.out.println("Unzipping " + downloadedSourceZip);
+
         int suffixDelimiterPosition = downloadedSourceZip.lastIndexOf(compressionExtension);
         String outputFileName = downloadedSourceZip.substring(0, suffixDelimiterPosition);
+        System.out.println("Unzipping " + downloadedSourceZip + " to " + outputFileName);
 
         GZIPInputStream inputZip = new GZIPInputStream(new FileInputStream(destinationDirectory + downloadedSourceZip));
 
         byte[] buffer = new byte[4096];
-        FileOutputStream outputFile = new FileOutputStream(outputFileName);
+        FileOutputStream outputFile = new FileOutputStream(destinationDirectory + outputFileName);
 
         int len;
         while ((len = inputZip.read(buffer)) > 0) {
