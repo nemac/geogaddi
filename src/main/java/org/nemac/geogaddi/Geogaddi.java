@@ -1,10 +1,11 @@
 package org.nemac.geogaddi;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -13,7 +14,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.nemac.geogaddi.config.PropertiesManager;
 import org.nemac.geogaddi.fetch.Fetcher;
-import org.nemac.geogaddi.write.Transformer;
+import org.nemac.geogaddi.transform.Transformer;
 
 public class Geogaddi {
     
@@ -21,6 +22,7 @@ public class Geogaddi {
     
     // command-line util
     public static void main(String args[]) {
+    	// command-line args
         Options options = new Options();
         options.addOption("a", false, "Runs both the fetch and the transform operations");
         options.addOption("f", false, "Runs only the fetch operation");
@@ -28,7 +30,6 @@ public class Geogaddi {
         Option propertyArg = new Option("p", true, "Defines the override properties for Geogaddi operations");
         propertyArg.setArgs(1);
         options.addOption(propertyArg);
-        
         
         CommandLineParser parser = new BasicParser();
         try {
@@ -43,17 +44,14 @@ public class Geogaddi {
             if (all || fetch) {
                 String fetchUrlPathProperty = propertiesManager.getProperty("fetcher.source.url");
                 String[] fetchUrls = fetchUrlPathProperty.replace(" ", "").split(",");
-                
-                // TODO convert from array to collection
-                List<String> fetchUrlPaths = new ArrayList();
-                for (String string : fetchUrls) {
-                    fetchUrlPaths.add(string);
-                }
-                
+
+                List<String> fetchUrlPaths = Arrays.asList(fetchUrls);                
                 Fetcher.multiFetch(fetchUrlPaths, propertiesManager.getProperty("fetcher.dump.dir"));
             }
             
             if (all || transform) {
+            	
+            	
                 Transformer.transform();
             }
             

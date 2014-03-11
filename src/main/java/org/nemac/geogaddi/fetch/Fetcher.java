@@ -12,7 +12,6 @@ import java.util.zip.GZIPInputStream;
 
 public class Fetcher {
 
-    private static final String TEMP_LOCATION = "foo";
     private static final String COMPRESSION_EXTENSION = ".gz";
 
     public static String fetch(String sourceUrlPath, String destinationDirectory) throws IOException {
@@ -21,7 +20,7 @@ public class Fetcher {
     }
 
     public static List<String> multiFetch(List<String> sourceUrlPaths, String destinationDirectory) throws IOException {
-        List<String> outputFiles = new ArrayList();
+        List<String> outputFiles = new ArrayList<String>();
 
         for (String sourceUrlPath : sourceUrlPaths) {
             outputFiles.add(fetch(sourceUrlPath, destinationDirectory));
@@ -48,8 +47,8 @@ public class Fetcher {
 
         inputStream.close();
         outputStream.close();
+        
         System.out.println("... download complete");
-
         return outputFilePath;
     }
 
@@ -77,7 +76,6 @@ public class Fetcher {
         outputFile.close();
 
         System.out.println("... unzip complete");
-
         return outputFileName;
     }
 }
