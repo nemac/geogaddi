@@ -1,5 +1,6 @@
 package org.nemac.geogaddi.fetch;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,7 +37,10 @@ public class Fetcher {
         InputStream inputStream = downloader.getInputStream();
 
         String outputFilePath = sourceUrlPath.substring(sourceUrlPath.lastIndexOf("/"));
-        FileOutputStream outputStream = new FileOutputStream(destinationDirectory + outputFilePath);
+        // build folder path, if doesn't exist
+        File destCSV = new File(destinationDirectory + outputFilePath);
+        destCSV.getParentFile().mkdirs();
+        FileOutputStream outputStream = new FileOutputStream(destCSV);
 
         byte[] buffer = new byte[4096];
         int len;
@@ -57,7 +61,6 @@ public class Fetcher {
     }
 
     private static String unzip(String downloadedSourceZip, String destinationDirectory, String compressionExtension) throws IOException {
-
         int suffixDelimiterPosition = downloadedSourceZip.lastIndexOf(compressionExtension);
         String outputFileName = downloadedSourceZip.substring(0, suffixDelimiterPosition);
         System.out.println("Unzipping " + downloadedSourceZip + " to " + outputFileName);
@@ -76,6 +79,6 @@ public class Fetcher {
         outputFile.close();
 
         System.out.println("... unzip complete");
-        return outputFileName;
+        return destinationDirectory + outputFileName;
     }
 }

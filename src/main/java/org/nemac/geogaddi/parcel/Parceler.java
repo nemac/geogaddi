@@ -1,6 +1,5 @@
-package org.nemac.geogaddi.transform;
+package org.nemac.geogaddi.parcel;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,33 +9,45 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.nemac.geogaddi.Geogaddi;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-public class Transformer {
+public class Parceler {
     
-    public static boolean transform(String sourceCSV, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr) throws IOException {
+    public static boolean parcel(List<String> csvSources, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr) throws IOException {
     	Set<String> whiteList = buildWhitelist(whiteListSource);
-    	Map<String, Map<String, List<String>>> sourceDataHash = hashSourceData(sourceCSV, whiteList, whiteListIdx, folderIdx, fileIdx, dataIdxArr);
     	
-    	// TODO write
+    	for (String sourceCSV : csvSources) {
+    		Map<String, Map<String, List<String>>> sourceDataHash = hashSourceData(sourceCSV, whiteList, whiteListIdx, folderIdx, fileIdx, dataIdxArr);
+    		// TODO write
+    	}
+    	
         return true;
     }
     
     private static Set<String> buildWhitelist(String whiteListSource) throws IOException {
-    	System.out.println("Building whitelist from " + whiteListSource);
+    	System.out.println("Building whitelist ");
     	Set<String> whiteList = new HashSet<String>();
     	
-    	CSVReader whiteListReader = new CSVReader(new FileReader(whiteListSource));
-    	
-    	String[] nextLine;
-    	while ((nextLine = whiteListReader.readNext()) != null) {
-    		whiteList.add(nextLine[0]);
+    	if (whiteListSource != null && !whiteListSource.isEmpty()) {
+    		System.out.print("from " + whiteListSource);
+    		CSVReader whiteListReader = new CSVReader(new FileReader(whiteListSource));
+    		String[] nextLine;
+        	while ((nextLine = whiteListReader.readNext()) != null) {
+        		whiteList.add(nextLine[0]);
+        	}
+        	
+        	whiteListReader.close();
+        	
+        	System.out.println("... whitelist built with " + whiteList.size() + " items");
+    	} else {
+    		System.out.println("... whitelist not found, no filtering will be perfomred");
     	}
     	
-    	whiteListReader.close();
-    	
-    	System.out.println("... whitelist built with " + whiteList.size() + " items");
     	return whiteList;
     }
     
