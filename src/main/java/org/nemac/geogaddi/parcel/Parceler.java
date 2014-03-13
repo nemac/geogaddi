@@ -3,30 +3,23 @@ package org.nemac.geogaddi.parcel;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
-import org.nemac.geogaddi.Geogaddi;
+import org.apache.commons.lang3.StringUtils;
 
 import au.com.bytecode.opencsv.CSVReader;
 
 public class Parceler {
     
-    public static boolean parcel(List<String> csvSources, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr) throws IOException {
+    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr) throws IOException {
     	Set<String> whiteList = buildWhitelist(whiteListSource);
-    	
-    	for (String sourceCSV : csvSources) {
-    		Map<String, Map<String, List<String>>> sourceDataHash = hashSourceData(sourceCSV, whiteList, whiteListIdx, folderIdx, fileIdx, dataIdxArr);
-    		// TODO write
-    	}
-    	
-        return true;
+   		return hashSourceData(csvSource, whiteList, whiteListIdx, folderIdx, fileIdx, dataIdxArr);
     }
     
     private static Set<String> buildWhitelist(String whiteListSource) throws IOException {
@@ -51,16 +44,16 @@ public class Parceler {
     	return whiteList;
     }
     
-    private static Map<String, Map<String, List<String>>> hashSourceData(String sourceCSV, Set<String> whiteList, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr) throws IOException {
+    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> whiteList, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr) throws IOException {
     	// The data are hashed as follows
     	// Map
     	// 	String -> Folder
     	//  Map
     	//    String -> File
-    	//    List   -> Row data
+    	//    Set   -> Row data
     	
     	System.out.println("Hashing " + sourceCSV);
-    	Map<String, Map<String, List<String>>> folderHash = new HashMap<String, Map<String, List<String>>>();
+    	Map<String, Map<String, Set<String>>> folderHash = new TreeMap<String, Map<String, Set<String>>>();
     	CSVReader dataReader = new CSVReader(new FileReader(sourceCSV));
     	
     	String [] nextLine;
@@ -71,20 +64,20 @@ public class Parceler {
     		}
     		
 			if (folderHash.containsKey(nextLine[folderIdx])) { // add to existing folder hash item
-				Map<String, List<String>> fileHash = folderHash.get(nextLine[folderIdx]);
+				Map<String, Set<String>> fileHash = folderHash.get(nextLine[folderIdx]);
 				
 				if (fileHash.containsKey(nextLine[fileIdx])) { // add to existing file hash item
-					List<String> dataRow = fileHash.get(nextLine[fileIdx]);
+					Set<String> dataRow = fileHash.get(nextLine[fileIdx]);
 					dataRow.add(getDataRow(nextLine, dataIdxArr));
 				} else { // create new file hash item
-					List<String> dataRow = new ArrayList<String>();
+					Set<String> dataRow = new TreeSet<String>();
 					dataRow.add(getDataRow(nextLine, dataIdxArr));
 					fileHash.put(nextLine[fileIdx], dataRow);
 				}
 			
 			} else { // create new folder hash item
-				Map<String, List<String>> fileHash = new HashMap<String, List<String>>();
-				List<String> dataRow = new ArrayList<String>();
+				Map<String, Set<String>> fileHash = new TreeMap<String, Set<String>>();
+				Set<String> dataRow = new TreeSet<String>();
 				dataRow.add(getDataRow(nextLine, dataIdxArr));
 				fileHash.put(nextLine[fileIdx], dataRow);
 				folderHash.put(nextLine[folderIdx], fileHash);
@@ -105,8 +98,6 @@ public class Parceler {
 			rowData.add(csvRow[dataIdx]);
 		}
 		
-		String[] rowArray = rowData.toArray(new String[rowData.size()]);
-		return Arrays.toString(rowArray);
+		return StringUtils.join(rowData, ",");
     }
-    
 }

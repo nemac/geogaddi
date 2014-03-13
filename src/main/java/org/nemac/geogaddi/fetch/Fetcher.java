@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.io.FileUtils;
+
 public class Fetcher {
 
     private static final String COMPRESSION_EXTENSION = ".gz";
@@ -64,8 +66,10 @@ public class Fetcher {
         int suffixDelimiterPosition = downloadedSourceZip.lastIndexOf(compressionExtension);
         String outputFileName = downloadedSourceZip.substring(0, suffixDelimiterPosition);
         System.out.println("Unzipping " + downloadedSourceZip + " to " + outputFileName);
+        
+        File downloadedSourceZipFile = new File(destinationDirectory + downloadedSourceZip);
 
-        GZIPInputStream inputZip = new GZIPInputStream(new FileInputStream(destinationDirectory + downloadedSourceZip));
+        GZIPInputStream inputZip = new GZIPInputStream(new FileInputStream(downloadedSourceZipFile));
 
         byte[] buffer = new byte[4096];
         FileOutputStream outputFile = new FileOutputStream(destinationDirectory + outputFileName);
@@ -77,6 +81,9 @@ public class Fetcher {
 
         inputZip.close();
         outputFile.close();
+        
+        // cleanup source zip
+        FileUtils.forceDelete(downloadedSourceZipFile);
 
         System.out.println("... unzip complete");
         return destinationDirectory + outputFileName;
