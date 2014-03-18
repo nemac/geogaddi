@@ -35,15 +35,24 @@ public class Geogaddi {
         options.addOption("f", false, "Runs only the fetch operation");
         options.addOption("t", false, "Runs only the transform operation");
         options.addOption("c", false, "Does an clean-write, default");
-        Option propertyArg = new Option("p", true, "Defines the override properties for Geogaddi operations");
+        Option propertyArg = new Option("p", true, "Defines the override properties for Geogaddi operations in Java Properties");
         propertyArg.setArgs(1);
         options.addOption(propertyArg);
+        Option jsonArg = new Option("j", true, "Defines the override properties for Geogaddi operations in JSON format");
+        jsonArg.setArgs(1);
+        options.addOption(jsonArg);
         
         CommandLineParser parser = new BasicParser();
         try {
             CommandLine cmd = parser.parse(options, args);
-            String propertiesLocation = cmd.getOptionValues("p")[0];
-            propertiesManager = new PropertiesManager(propertiesLocation);
+            
+            if (cmd.hasOption("p")) {
+            	String propertiesLocation = cmd.getOptionValues("p")[0];
+                propertiesManager = PropertiesManager.createFromPropertiesFile(propertiesLocation);
+            } else if (cmd.hasOption("j")) {
+            	String propertiesLocation = cmd.getOptionValues("j")[0];
+            	propertiesManager = PropertiesManager.createFromJSON(propertiesLocation);
+            }
             
             boolean all = cmd.hasOption("a");
             boolean fetch =  cmd.hasOption("f");

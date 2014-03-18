@@ -3,10 +3,10 @@ package org.nemac.geogaddi.write;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 
@@ -28,33 +28,23 @@ public class Writer {
 				if (destFile.exists()) {
 					// scan and compare duplicate lines between the file and the hash
 					List<String> sourceList = FileUtils.readLines(destFile);
+					// remove duplicates from hash
 					List<String> hashedList = new ArrayList<String>(fileEntry.getValue());
+					hashedList.removeAll(sourceList);
 					
-					boolean sortRequired = false;
-					
-					// if no elements are common, can be appended cleanly
-					if (!sourceList.isEmpty() && !Collections.disjoint(sourceList, hashedList)) {
-						// compare order of source and hash to determine if full sort is required
-						for (int i = 0; i < sourceList.size(); i++) {
-							if (!sourceList.get(i).equals(hashedList.get(i))) {
-								sortRequired = true;
-								break;
-							}
-						}
-					}
-
-					if (sortRequired) {
+					// check last element of source list to see if it should come before new item hash
+					if (!sourceList.isEmpty() && !hashedList.isEmpty() && sourceList.get(sourceList.size() -1).compareTo(hashedList.get(0)) > 0) {
 						System.out.println("... backlog data detected, rebuilding output");
-						FileUtils.writeLines(destFile, fileEntry.getValue());
+						Set<String> writeSet = new TreeSet<String>();
+						writeSet.addAll(sourceList);
+						writeSet.addAll(hashedList);
+						FileUtils.writeLines(destFile, writeSet);						
 					} else {
-						// remove duplicates
-						fileEntry.getValue().removeAll(sourceList);
-						
-						if (fileEntry.getValue().size() == 0) {
+						if (hashedList.size() == 0) {
 							System.out.println("... skipping " + destFile + " - all entries are duplicates");
 						} else {
 							//System.out.print("... appending new lines to the end");
-							FileUtils.writeLines(destFile, fileEntry.getValue(), true);
+							FileUtils.writeLines(destFile, hashedList, true);
 						}
 					}
 				} else {
