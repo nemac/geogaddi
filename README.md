@@ -52,7 +52,7 @@ Will perform a transform operation on the CSVs defined in the Java-format proper
 		"source": [
 			// array of URLs of gzipped CSVs to download
 		],
-		"dumpDir": // directory where the fetcher should download the data
+		"dumpDir": "data/dump" // directory where the fetcher should download the data
 	},
 	"parceler": {
 		"sourceCsv": [
@@ -70,46 +70,50 @@ Will perform a transform operation on the CSVs defined in the Java-format proper
 
 ####Examples
 Input CSV format
-	STATION,DATE,VARIABLE,VALUE
+STATION,DATE,VARIABLE,VALUE
 
 Properties:
-	parceler.parcel.folder.index=0
-	parceler.parcel.file.index=2
-	parceler.parcel.data.index=1,3
+'''java
+parceler.parcel.folder.index=0
+parceler.parcel.file.index=2
+parceler.parcel.data.index=1,3
+'''
 	
 Output:
-	STATION/VARIABLE.csv
-		-> DATE,VALUE
-		-> DATE,VALUE ...
+STATION/VARIABLE.csv
+-> DATE,VALUE
+-> DATE,VALUE ...
 
 Properties:
-	parceler.parcel.folder.index=2
-	parceler.parcel.file.index=0
-	parceler.parcel.data.index=3,1
+'''java
+parceler.parcel.folder.index=2
+parceler.parcel.file.index=0
+parceler.parcel.data.index=3,1
+'''
 
 Output:
-	VARIABLE/STATION.csv
-		-> VALUE,DATE
-		-> VALUE,DATE ...
+VARIABLE/STATION.csv
+-> VALUE,DATE
+-> VALUE,DATE ...
 
 Note that the output will always be in ascending order with the entire line viewed as a single string. So for the first example properties, the output will look like the following:
 
 ...
-	17641227,64
-	17641228,66
-	17641229,55
-	17641230,58
-	17641231,69
+17641227,64
+17641228,66
+17641229,55
+17641230,58
+17641231,69
 ...
 
 Whereas this same block in the second example properties would look like:
 
 ...
-	55,17641229
-	58,17641230
-	64,17641227
-	66,17641228
-	69,17641231
+55,17641229
+58,17641230
+64,17641227
+66,17641228
+69,17641231
 ...
 
 Therefore, it usually makes the most sense to have date (or something equally meaningful) output in the first column.
@@ -117,11 +121,5 @@ Therefore, it usually makes the most sense to have date (or something equally me
 ## Todo
 
 ### 0.1
-- Document
-- Add some visual effects to link the graph to the points
-  - Maybe mouseover graph and the corresponding marker gets larger?
-  - Maybe make the border around the graph get bigger when mouseover the point?
-- Further encapsulate additional OpenLayers-specific map functionality
-
-## Credits
-- Remove element icon is "Cross Icon" from FamFamFam Silk Icons
+- Work with the zipped files and don't bother storing an uncompressed version
+- Add transport component
