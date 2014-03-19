@@ -70,34 +70,41 @@ Will perform a transform operation on the CSVs defined in the Java-format proper
 
 ####Examples
 Input CSV format
+```shell
 STATION,DATE,VARIABLE,VALUE
+```
 
-Properties:
-'''java
+Properties
+```java
 parceler.parcel.folder.index=0
 parceler.parcel.file.index=2
 parceler.parcel.data.index=1,3
-'''
+```
 	
-Output:
+Output
+```shell
 STATION/VARIABLE.csv
 -> DATE,VALUE
 -> DATE,VALUE ...
+```
 
-Properties:
-'''java
+Properties
+```java
 parceler.parcel.folder.index=2
 parceler.parcel.file.index=0
 parceler.parcel.data.index=3,1
-'''
+```
 
-Output:
+Output
+```shell
 VARIABLE/STATION.csv
 -> VALUE,DATE
 -> VALUE,DATE ...
+```
 
 Note that the output will always be in ascending order with the entire line viewed as a single string. So for the first example properties, the output will look like the following:
 
+```shell
 ...
 17641227,64
 17641228,66
@@ -105,9 +112,11 @@ Note that the output will always be in ascending order with the entire line view
 17641230,58
 17641231,69
 ...
+```
 
 Whereas this same block in the second example properties would look like:
 
+```shell
 ...
 55,17641229
 58,17641230
@@ -115,11 +124,11 @@ Whereas this same block in the second example properties would look like:
 66,17641228
 69,17641231
 ...
+```
 
 Therefore, it usually makes the most sense to have date (or something equally meaningful) output in the first column.
 
 ## Todo
-
 ### 0.1
 - Work with the zipped files and don't bother storing an uncompressed version
 - Add transport component
