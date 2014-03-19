@@ -18,7 +18,7 @@ An executable JAR with dependencies will deploy to the target/ directory.
 - -a : perform both a fetch and transform operation
 - -f : perform only the fetch operation
 - -t : perform only the transform operation
-- -c : clean the output directory before writing to it
+- -c : clean the output directory before writing to it, will also empty the target S3 bucket
 - -u : unzip the fetched file and worked with uncompressed data
 - -p path/to/geogaddi.properties : location of Java-formatted properties file
 - -j path/to/geogaddi.json : location of JSON properties file
@@ -45,6 +45,9 @@ Will perform a transform operation on the CSVs defined in the Java-format proper
 - parceler.parcel.file.index : CSV column index that will be used to define the output file structure within the directories defined above; each distinct element in this column will have its own file built
 - parceler.parcel.data.index : comma-separated list of CSV column indices that will be used to define the output data pattern
 - parceler.output.dir : path to the output from the transform operation
+integrator.s3.accesskeyid : AWS access Key ID - see notes below
+integrator.s3.secretkey : AWS secret key - see notes below
+integrator.s3.bucket.name : AWS S3 bucket, will create if it doesn't exist; policies are not applied
 
 ###Properties (JSON format)
 ```json
@@ -65,6 +68,11 @@ Will perform a transform operation on the CSVs defined in the Java-format proper
 		"fileIndex": 2, // CSV column index for distinct elements that will define the output file structure within the directories above
 		"dataIndex": [1,3], // array of indices for the output data pattern
 		"outputDir": "data/output" // path to output from the transform operation
+	},
+	"integrator": {
+		"awsAccessKeyId": "", // AWS access Key ID - see notes below
+		"awsSecretKey": "", // AWS secret key - see notes below
+		"bucketName": "" // AWS S3 bucket, will create if it doesn't exist; policies are not applied
 	}
 }
 ```
@@ -129,16 +137,15 @@ Whereas this same block in the second example properties would look like:
 
 Therefore, it usually makes the most sense to have date (or something equally meaningful) output in the first column.
 
-###Working with S3
-
+###Working with AWS S3
 Some things to note to get this to work correctly with S3.
 
-Set up the credentials as described here: [a link](http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/java-dg-setup.html) BUT ALSO! In the IAM console, also explicitly give Amazon S3 Full Access permissions to the user with the generated credentiails. Administrator Access is not sufficient!
+Set up the credentials as [described here](http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/java-dg-setup.html). BUT ALSO! In the IAM console, also explicitly give Amazon S3 Full Access permissions to the user with the generated credentiails. Administrator Access is not sufficient!
 
 To make the bucket contents public, set the following bucket policy from the S3 console
 ```json
 {
-  "Version":"2014-03-19",
+  "Version":"2012-10-17",
   "Statement":[{
     "Sid":"AllowPublicRead",
         "Effect":"Allow",
@@ -155,6 +162,5 @@ To make the bucket contents public, set the following bucket policy from the S3 
 
 ## Todo
 ### 0.1
-- Exit program cleanly with the async TransferManager
-- Document transport
-- Document uncompressed mode
+- Exit program cleanly when using integrator
+- Block bucket destruction, then create
