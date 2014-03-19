@@ -19,6 +19,7 @@ An executable JAR with dependencies will deploy to the target/ directory.
 - -f : perform only the fetch operation
 - -t : perform only the transform operation
 - -c : clean the output directory before writing to it
+- -u : unzip the fetched file and worked with uncompressed data
 - -p path/to/geogaddi.properties : location of Java-formatted properties file
 - -j path/to/geogaddi.json : location of JSON properties file
 
@@ -128,7 +129,32 @@ Whereas this same block in the second example properties would look like:
 
 Therefore, it usually makes the most sense to have date (or something equally meaningful) output in the first column.
 
+###Working with S3
+
+Some things to note to get this to work correctly with S3.
+
+Set up the credentials as described here: [a link](http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/java-dg-setup.html) BUT ALSO! In the IAM console, also explicitly give Amazon S3 Full Access permissions to the user with the generated credentiails. Administrator Access is not sufficient!
+
+To make the bucket contents public, set the following bucket policy from the S3 console
+```json
+{
+  "Version":"2014-03-19",
+  "Statement":[{
+    "Sid":"AllowPublicRead",
+        "Effect":"Allow",
+      "Principal": {
+            "AWS": "*"
+         },
+      "Action":["s3:GetObject"],
+      "Resource":["arn:aws:s3:::changeThisToYourBucketName/*"
+      ]
+    }
+  ]
+}
+```
+
 ## Todo
 ### 0.1
-- Work with the zipped files and don't bother storing an uncompressed version
-- Add transport component
+- Exit program cleanly with the async TransferManager
+- Document transport
+- Document uncompressed mode

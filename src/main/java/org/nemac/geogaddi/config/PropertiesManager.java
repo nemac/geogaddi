@@ -12,6 +12,8 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+
 public class PropertiesManager {
     
     private static final String DEFAULT_PROPERTIES_PATH = "geogaddi.properties";
@@ -26,6 +28,8 @@ public class PropertiesManager {
     private int folderIdx;
     private int fileIdx;
     private int[] dataIdxArr;
+    private BasicAWSCredentials credentials;
+    private String bucketName;
 
     private PropertiesManager() {
 		
@@ -64,6 +68,10 @@ public class PropertiesManager {
     	}
     	
     	p.dataIdxArr = dataIdxArr;
+    	
+    	// integrator
+    	p.credentials = new BasicAWSCredentials(properties.getProperty("integrator.s3.accesskeyid"), properties.getProperty("integrator.s3.secretkey"));
+    	p.bucketName = properties.getProperty("integrator.s3.bucket.name");
     	
     	return p;
     }
@@ -107,6 +115,11 @@ public class PropertiesManager {
     	
     	p.dataIdxArr = dataIdxArr;
     	
+    	// integrator
+    	JSONObject integratorNode = rootNode.getJSONObject("integrator");
+    	p.credentials = new BasicAWSCredentials(integratorNode.getString("awsAccessKeyId"), integratorNode.getString("awsSecretKey"));
+    	p.bucketName = integratorNode.getString("bucketName");
+    	
     	return p;
     }
 
@@ -149,6 +162,13 @@ public class PropertiesManager {
 	public String getProperty(String key) {
 		return properties.getProperty(key);
 	}
+	
+	public BasicAWSCredentials getCredentials() {
+		return credentials;
+	}
     
+	public String getBucketName() {
+		return bucketName;
+	}
     
 }

@@ -1,15 +1,17 @@
 package org.nemac.geogaddi.parcel;
 
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,9 +19,9 @@ import au.com.bytecode.opencsv.CSVReader;
 
 public class Parceler {
     
-    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr) throws IOException {
+    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr, boolean unzip) throws IOException {
     	Set<String> whiteList = buildWhitelist(whiteListSource);
-   		return hashSourceData(csvSource, whiteList, whiteListIdx, folderIdx, fileIdx, dataIdxArr);
+   		return hashSourceData(csvSource, whiteList, whiteListIdx, folderIdx, fileIdx, dataIdxArr, unzip);
     }
     
     private static Set<String> buildWhitelist(String whiteListSource) throws IOException {
@@ -44,7 +46,7 @@ public class Parceler {
     	return whiteList;
     }
     
-    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> whiteList, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr) throws IOException {
+    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> whiteList, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr, boolean unzip) throws IOException {
     	// The data are hashed as follows
     	// Map
     	// 	String -> Folder
@@ -54,7 +56,14 @@ public class Parceler {
     	
     	System.out.println("Hashing " + sourceCSV);
     	Map<String, Map<String, Set<String>>> folderHash = new TreeMap<String, Map<String, Set<String>>>();
-    	CSVReader dataReader = new CSVReader(new FileReader(sourceCSV));
+    	
+    	CSVReader dataReader;
+    	if (unzip) {
+    		dataReader = new CSVReader(new FileReader(sourceCSV));
+    	} else {
+    		GZIPInputStream in = new GZIPInputStream(new FileInputStream(sourceCSV));
+    		dataReader = new CSVReader(new InputStreamReader(in));
+    	}
     	
     	String [] nextLine;
     	while ((nextLine = dataReader.readNext()) != null) {

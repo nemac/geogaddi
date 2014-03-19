@@ -18,6 +18,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.nemac.geogaddi.config.PropertiesManager;
 import org.nemac.geogaddi.fetch.Fetcher;
+import org.nemac.geogaddi.integrate.Integrator;
 import org.nemac.geogaddi.parcel.Parceler;
 import org.nemac.geogaddi.write.Writer;
 
@@ -31,10 +32,12 @@ public class Geogaddi {
     	
     	// command-line args
         Options options = new Options();
-        options.addOption("a", false, "Runs both the fetch and the transform operations");
+        options.addOption("a", false, "Runs the fetch, transform, and integrator operations");
         options.addOption("f", false, "Runs only the fetch operation");
         options.addOption("t", false, "Runs only the transform operation");
         options.addOption("c", false, "Does an clean-write, default");
+        options.addOption("u", false, "Work with unzipped files");
+        options.addOption("i", false, "Runs only the integrator operation");
         Option propertyArg = new Option("p", true, "Defines the override properties for Geogaddi operations in Java Properties");
         propertyArg.setArgs(1);
         options.addOption(propertyArg);
@@ -57,13 +60,14 @@ public class Geogaddi {
             boolean all = cmd.hasOption("a");
             boolean fetch =  cmd.hasOption("f");
             boolean transform = cmd.hasOption("t");
-            
             boolean clean = cmd.hasOption("c");
+            boolean unzip = cmd.hasOption("u");
+            boolean integrate = cmd.hasOption("i");
             
             List<String> csvSources = new ArrayList<String>();
             
             if (all || fetch) {
-                csvSources = Fetcher.multiFetch(propertiesManager.getFetchUrls(), propertiesManager.getDumpDir());
+                csvSources = Fetcher.multiFetch(propertiesManager.getFetchUrls(), propertiesManager.getDumpDir(), unzip);
             }
             
             if (all || transform) {
@@ -85,10 +89,14 @@ public class Geogaddi {
             	for (String csvSource : csvSources) {
             		Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource, 
             				propertiesManager.getDestinatonDir(), propertiesManager.getWhiteListSource(), propertiesManager.getWhiteListIdx(), 
-            				propertiesManager.getFolderIdx(), propertiesManager.getFileIdx(), propertiesManager.getDataIdxArr());
+            				propertiesManager.getFolderIdx(), propertiesManager.getFileIdx(), propertiesManager.getDataIdxArr(), unzip);
             		
-            			Writer.write(parcelMap, propertiesManager.getDestinatonDir());
+            		Writer.write(parcelMap, propertiesManager.getDestinatonDir());
             	}
+            }
+            
+            if (all || integrate) {
+            	Integrator.integrate(propertiesManager.getCredentials(), propertiesManager.getDestinatonDir(), propertiesManager.getBucketName(), clean);
             }
             
         } catch (ParseException | IOException ex) {

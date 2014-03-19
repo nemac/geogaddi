@@ -16,20 +16,24 @@ import org.apache.commons.io.FileUtils;
 public class Fetcher {
 
     private static final String COMPRESSION_EXTENSION = ".gz";
-
-    public static String fetch(String sourceUrlPath, String destinationDirectory) throws IOException {
-        String downloadedFilePath = download(sourceUrlPath, destinationDirectory);
-        return unzip(downloadedFilePath, destinationDirectory);
-    }
-
-    public static List<String> multiFetch(List<String> sourceUrlPaths, String destinationDirectory) throws IOException {
+    
+    public static List<String> multiFetch(List<String> sourceUrlPaths, String destinationDirectory, boolean unzip) throws IOException {
         List<String> outputFiles = new ArrayList<String>();
 
         for (String sourceUrlPath : sourceUrlPaths) {
-            outputFiles.add(fetch(sourceUrlPath, destinationDirectory));
+        	outputFiles.add(fetch(sourceUrlPath, destinationDirectory, unzip));
         }
 
         return outputFiles;
+    }
+
+    public static String fetch(String sourceUrlPath, String destinationDirectory, boolean unzip) throws IOException {
+        String downloadedFilePath = download(sourceUrlPath, destinationDirectory);
+        if (unzip) {
+        	return destinationDirectory + unzip(downloadedFilePath, destinationDirectory);
+        } else {
+        	return destinationDirectory + downloadedFilePath;
+        }
     }
 
     private static String download(String sourceUrlPath, String destinationDirectory) throws IOException {
@@ -86,6 +90,6 @@ public class Fetcher {
         FileUtils.forceDelete(downloadedSourceZipFile);
 
         System.out.println("... unzip complete");
-        return destinationDirectory + outputFileName;
+        return outputFileName;
     }
 }
