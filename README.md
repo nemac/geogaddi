@@ -74,28 +74,28 @@ Input CSV format
 STATION,DATE,VARIABLE,VALUE
 ```
 
-Properties
+Properties 1
 ```java
 parceler.parcel.folder.index=0
 parceler.parcel.file.index=2
 parceler.parcel.data.index=1,3
 ```
 	
-Output
+Output 1
 ```shell
 STATION/VARIABLE.csv
 -> DATE,VALUE
 -> DATE,VALUE ...
 ```
 
-Properties
+Properties 2
 ```java
 parceler.parcel.folder.index=2
 parceler.parcel.file.index=0
 parceler.parcel.data.index=3,1
 ```
 
-Output
+Output 2
 ```shell
 VARIABLE/STATION.csv
 -> VALUE,DATE
