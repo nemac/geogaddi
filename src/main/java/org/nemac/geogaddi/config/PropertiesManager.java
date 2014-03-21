@@ -18,19 +18,30 @@ public class PropertiesManager {
     
     private static final String DEFAULT_PROPERTIES_PATH = "geogaddi.properties";
 
-	private static Properties properties = new Properties();
-    private List<String> fetchUrls;
-    private String dumpDir;
+	private Properties properties = new Properties();
+	private boolean override;
+	private boolean useAll;
+	private boolean fetcherEnabled;
+	private boolean fetcherUncompress;
+    private List<String> fetcherUrls;
+    private String fetcherDumpDir;
+    private boolean parcelerEnabled;
+    private boolean parcelerUncompress;
+    private boolean parcelerCleanSource;
+    private boolean parcelerCleanDestination;
+    private boolean parcelerExistingFromIntegrator;
     private List<String> parcelerSources;
-    private String destinatonDir;
-    private String whiteListSource;
-    private int whiteListIdx;
-    private int folderIdx;
-    private int fileIdx;
-    private int[] dataIdxArr;
+    private String parcelerDestinatonDir;
+    private String parcelerWhiteListSource;
+    private int parcelerWhiteListIdx;
+    private int parcelerFolderIdx;
+    private int parcelerFileIdx;
+    private int[] parcelerDataIdxArr;
+    private boolean integratorEnabled;
+    private boolean integratorCleanSource;
     private String integratorSourceDir;
-    private BasicAWSCredentials credentials;
-    private String bucketName;
+    private BasicAWSCredentials integratorCredentials;
+    private String integratorBucketName;
 
     private PropertiesManager() {
 		
@@ -38,29 +49,32 @@ public class PropertiesManager {
     
     public static final PropertiesManager createFromPropertiesFile(String propertiesSource) throws IOException {
     	PropertiesManager p = new PropertiesManager();
+    	Properties props = new Properties();
     	
         if (propertiesSource == null) {
             propertiesSource = DEFAULT_PROPERTIES_PATH;
         }
         
         FileReader reader = new FileReader(propertiesSource);
-        properties.load(reader);
+        props.load(reader);
+        
+        p.properties = props;
         
         // fetcher
-        String fetchUrlPathProperty = properties.getProperty("fetcher.source.url");
-        p.fetchUrls = Arrays.asList(fetchUrlPathProperty.replace(" ", "").split(","));
-        p.dumpDir = properties.getProperty("fetcher.dump.dir");
+        String fetchUrlPathProperty = props.getProperty("fetcher.source.url");
+        p.fetcherUrls = Arrays.asList(fetchUrlPathProperty.replace(" ", "").split(","));
+        p.fetcherDumpDir = props.getProperty("fetcher.dump.dir");
         
         // parceler
-        String sourceCSVProperty = properties.getProperty("parceler.source.csv");
+        String sourceCSVProperty = props.getProperty("parceler.source.csv");
 		p.parcelerSources = Arrays.asList(sourceCSVProperty.replace(" ", "").split(","));
 		
-    	p.destinatonDir = properties.getProperty("parceler.output.dir");
-    	p.whiteListSource = properties.getProperty("parceler.parcel.whitelist.source");
-    	p.whiteListIdx = new Integer(properties.getProperty("parceler.parcel.whitelist.filter.index"));
-    	p.folderIdx = new Integer(properties.getProperty("parceler.parce.folder.index"));
-    	p.fileIdx = new Integer(properties.getProperty("parceler.parce.file.index"));
-    	String dataIdxProperty = properties.getProperty("parceler.parce.data.index");
+    	p.parcelerDestinatonDir = props.getProperty("parceler.output.dir");
+    	p.parcelerWhiteListSource = props.getProperty("parceler.parcel.whitelist.source");
+    	p.parcelerWhiteListIdx = new Integer(props.getProperty("parceler.parcel.whitelist.filter.index"));
+    	p.parcelerFolderIdx = new Integer(props.getProperty("parceler.parce.folder.index"));
+    	p.parcelerFileIdx = new Integer(props.getProperty("parceler.parce.file.index"));
+    	String dataIdxProperty = props.getProperty("parceler.parce.data.index");
     	String[] dataIdxStrArr = dataIdxProperty.replace(" ", "").split(",");
     	int[] dataIdxArr = new int[dataIdxStrArr.length];
     	
@@ -68,12 +82,12 @@ public class PropertiesManager {
     		dataIdxArr[i] = Integer.parseInt(dataIdxStrArr[i]);
     	}
     	
-    	p.dataIdxArr = dataIdxArr;
+    	p.parcelerDataIdxArr = dataIdxArr;
     	
     	// integrator
-    	p.integratorSourceDir = properties.getProperty("integrator.source.dir");
-    	p.credentials = new BasicAWSCredentials(properties.getProperty("integrator.s3.accesskeyid"), properties.getProperty("integrator.s3.secretkey"));
-    	p.bucketName = properties.getProperty("integrator.s3.bucket.name");
+    	p.integratorSourceDir = props.getProperty("integrator.source.dir");
+    	p.integratorCredentials = new BasicAWSCredentials(props.getProperty("integrator.s3.accesskeyid"), props.getProperty("integrator.s3.secretkey"));
+    	p.integratorBucketName = props.getProperty("integrator.s3.bucket.name");
     	
     	return p;
     }
@@ -84,29 +98,39 @@ public class PropertiesManager {
     	String input = FileUtils.readFileToString(new File(jsonPath));
     	JSONObject rootNode = new JSONObject(input);
     	
+    	//override
+    	p.override = rootNode.getBoolean("override");
+    	p.useAll = rootNode.getBoolean("useAll");
+    	
     	// fetcher
     	JSONObject fetcherNode = rootNode.getJSONObject("fetcher");
+    	p.fetcherEnabled = fetcherNode.getBoolean("enabled");
+    	p.fetcherUncompress = fetcherNode.getBoolean("uncompress");
     	JSONArray fetcherUrls = fetcherNode.getJSONArray("source");
     	List<String> fetchUrls = new ArrayList<String>();
     	for (int i = 0; i < fetcherUrls.length(); i++) {
     		fetchUrls.add(fetcherUrls.getString(i));
     	}
-    	p.fetchUrls = fetchUrls;
-    	p.dumpDir = fetcherNode.getString("dumpDir");
+    	p.fetcherUrls = fetchUrls;
+    	p.fetcherDumpDir = fetcherNode.getString("dumpDir");
     	
         // parceler
     	JSONObject parcelerNode = rootNode.getJSONObject("parceler");
+    	p.parcelerEnabled = parcelerNode.getBoolean("enabled");
+    	p.parcelerUncompress = parcelerNode.getBoolean("uncompress");
+    	p.parcelerCleanSource = parcelerNode.getBoolean("cleanSource");
+    	p.parcelerCleanDestination = parcelerNode.getBoolean("cleanDestination");
     	JSONArray sourceCsvs = parcelerNode.getJSONArray("sourceCsv");
     	List<String> parcelerSources = new ArrayList<String>();
     	for (int i = 0; i < sourceCsvs.length(); i++) {
     		parcelerSources.add(sourceCsvs.getString(i));
     	}
     	p.parcelerSources = parcelerSources;
-    	p.destinatonDir =  parcelerNode.getString("outputDir");
-    	p.whiteListSource = parcelerNode.getString("whiteList");
-    	p.whiteListIdx = (int) parcelerNode.getLong("whiteListIndex");
-    	p.folderIdx = (int) parcelerNode.getLong("folderIndex");
-    	p.fileIdx = (int) parcelerNode.getLong("fileIndex");
+    	p.parcelerDestinatonDir =  parcelerNode.getString("outputDir");
+    	p.parcelerWhiteListSource = parcelerNode.getString("whiteList");
+    	p.parcelerWhiteListIdx = (int) parcelerNode.getLong("whiteListIndex");
+    	p.parcelerFolderIdx = (int) parcelerNode.getLong("folderIndex");
+    	p.parcelerFileIdx = (int) parcelerNode.getLong("fileIndex");
     	
     	JSONArray dataIndexes = parcelerNode.getJSONArray("dataIndex");
     	int[] dataIdxArr = new int[dataIndexes.length()];
@@ -115,23 +139,69 @@ public class PropertiesManager {
     		dataIdxArr[i] = (int) dataIndexes.getLong(i);
     	}
     	
-    	p.dataIdxArr = dataIdxArr;
+    	p.parcelerDataIdxArr = dataIdxArr;
     	
     	// integrator
     	JSONObject integratorNode = rootNode.getJSONObject("integrator");
+    	p.integratorEnabled = integratorNode.getBoolean("enabled");
+    	p.integratorCleanSource = integratorNode.getBoolean("cleanSource");
     	p.integratorSourceDir = integratorNode.getString("sourceDir");
-    	p.credentials = new BasicAWSCredentials(integratorNode.getString("awsAccessKeyId"), integratorNode.getString("awsSecretKey"));
-    	p.bucketName = integratorNode.getString("bucketName");
+    	p.integratorCredentials = new BasicAWSCredentials(integratorNode.getString("awsAccessKeyId"), integratorNode.getString("awsSecretKey"));
+    	p.integratorBucketName = integratorNode.getString("bucketName");
     	
     	return p;
     }
+    
+	public String getProperty(String key) {
+		if (properties != null && !properties.isEmpty()) {
+			return properties.getProperty(key);
+		} else {
+			return null;
+		}
+	}
+    
+    public boolean isOverride() {
+    	return override;
+    }
+    
+    public boolean isUseAll() {
+    	return useAll;
+    }
+    
+    public boolean isFetcherEnabled() {
+    	return fetcherEnabled;
+    }
+    
+    public boolean isFetcherUncompress() {
+    	return fetcherUncompress;
+    }
 
 	public List<String> getFetchUrls() {
-		return fetchUrls;
+		return fetcherUrls;
 	}
 
 	public String getDumpDir() {
-		return dumpDir;
+		return fetcherDumpDir;
+	}
+	
+	public boolean isParcelerEnabled() {
+		return parcelerEnabled;
+	}
+	
+	public boolean isParcelerUncompress() {
+		return parcelerUncompress;
+	}
+	
+	public boolean isParcelerCleanSource() {
+		return parcelerCleanSource;
+	}
+	
+	public boolean isParcelerCleanDestination() {
+		return parcelerCleanDestination;
+	}
+	
+	public boolean isParcelerExistingFromIntegrator() {
+		return parcelerExistingFromIntegrator;
 	}
 
 	public List<String> getParcelerSources() {
@@ -139,31 +209,35 @@ public class PropertiesManager {
 	}
 
 	public String getDestinatonDir() {
-		return destinatonDir;
+		return parcelerDestinatonDir;
 	}
 
 	public String getWhiteListSource() {
-		return whiteListSource;
+		return parcelerWhiteListSource;
 	}
 
 	public int getWhiteListIdx() {
-		return whiteListIdx;
+		return parcelerWhiteListIdx;
 	}
 
 	public int getFolderIdx() {
-		return folderIdx;
+		return parcelerFolderIdx;
 	}
 
 	public int getFileIdx() {
-		return fileIdx;
+		return parcelerFileIdx;
 	}
 
 	public int[] getDataIdxArr() {
-		return dataIdxArr;
+		return parcelerDataIdxArr;
 	}
 	
-	public String getProperty(String key) {
-		return properties.getProperty(key);
+	public boolean isIntegratorEnabled() {
+		return integratorEnabled;
+	}
+	
+	public boolean isIntegratorCleanSource() {
+		return integratorCleanSource;
 	}
 	
 	public String getIntegratorSourceDir() {
@@ -171,11 +245,11 @@ public class PropertiesManager {
 	}
 	
 	public BasicAWSCredentials getCredentials() {
-		return credentials;
+		return integratorCredentials;
 	}
     
 	public String getBucketName() {
-		return bucketName;
+		return integratorBucketName;
 	}
     
 }

@@ -14,7 +14,8 @@ public class Writer {
 	
 	private static final String outputPattern = "%s/%s/%s.csv";
 	
-	public static void write(Map<String, Map<String, Set<String>>> parcelMap, String destDirPath) throws IOException {
+	// TODO: use uncompress flag to optionally work with gzipped files
+	public static void write(Map<String, Map<String, Set<String>>> parcelMap, String destDirPath, boolean uncompress) throws IOException {
 		destDirPath = conformDirectoryString(destDirPath);
 		System.out.println("Writing to " + destDirPath);
 		

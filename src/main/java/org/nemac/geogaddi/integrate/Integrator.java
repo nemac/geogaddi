@@ -9,6 +9,8 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.transfer.ObjectMetadataProvider;
 import com.amazonaws.services.s3.transfer.TransferManager;
 
 public class Integrator {
@@ -28,6 +30,16 @@ public class Integrator {
 			BucketDestroy.emptyBucket(s3, bucketName);
 		}
 		
+		// TODO: after write GZ to S3, add metadataProvider to uploadDirectory args
+		/*
+		ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
+			@Override
+			public void provideObjectMetadata(File file, ObjectMetadata metadata) {
+				metadata.setHeader("content-encoding", "gzip");
+			}
+		};
+		*/
+				
 		TransferManager transfer = new TransferManager(s3);
 		transfer.uploadDirectory(bucketName, null, new File(sourceDir), true).addProgressListener(new ProgressListener() {
 			@Override

@@ -1,5 +1,9 @@
 {
+	"override": true,
+	"useAll": true,
 	"fetcher": {
+		"enabled": true,
+		"uncompress": false,
 		"source": [
 			"ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1763.csv.gz",
 			"ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1764.csv.gz"
@@ -7,6 +11,11 @@
 		"dumpDir": "data/dump"
 	},
 	"parceler": {
+		"enabled": true,
+		"uncompress": false,
+		"cleanSource": false,
+		"cleanDestination": false,
+		"existingFromIntegrator": true,
 		"sourceCsv": [
 			"data/dump/1763.csv",
 			"data/dump/1764.csv"
@@ -19,6 +28,8 @@
 		"outputDir": "data/output"
 	},
 	"integrator": {
+		"enabled": true,
+		"cleanSource":false,
 		"sourceDir": "data/output",
 		"awsAccessKeyId": "",
 		"awsSecretKey": "",

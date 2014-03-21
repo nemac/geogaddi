@@ -19,9 +19,9 @@ import au.com.bytecode.opencsv.CSVReader;
 
 public class Parceler {
     
-    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr, boolean unzip) throws IOException {
+    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed) throws IOException {
     	Set<String> whiteList = buildWhitelist(whiteListSource);
-   		return hashSourceData(csvSource, whiteList, whiteListIdx, folderIdx, fileIdx, dataIdxArr, unzip);
+   		return hashSourceData(csvSource, whiteList, whiteListIdx, folderIdx, fileIdx, dataIdxArr, isSourceUncompressed);
     }
     
     private static Set<String> buildWhitelist(String whiteListSource) throws IOException {
@@ -46,7 +46,7 @@ public class Parceler {
     	return whiteList;
     }
     
-    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> whiteList, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr, boolean unzip) throws IOException {
+    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> whiteList, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed) throws IOException {
     	// The data are hashed as follows
     	// Map
     	// 	String -> Folder
@@ -58,7 +58,7 @@ public class Parceler {
     	Map<String, Map<String, Set<String>>> folderHash = new TreeMap<String, Map<String, Set<String>>>();
     	
     	CSVReader dataReader;
-    	if (unzip) {
+    	if (isSourceUncompressed) {
     		dataReader = new CSVReader(new FileReader(sourceCSV));
     	} else {
     		GZIPInputStream in = new GZIPInputStream(new FileInputStream(sourceCSV));
