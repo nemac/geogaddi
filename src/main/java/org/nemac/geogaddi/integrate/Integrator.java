@@ -25,7 +25,7 @@ public class Integrator {
 		}
 		
 		if (clean) {
-			BucketDestroy.destroyBucket(s3, bucketName);
+			BucketDestroy.emptyBucket(s3, bucketName);
 		}
 		
 		TransferManager transfer = new TransferManager(s3);

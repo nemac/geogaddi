@@ -19,7 +19,7 @@
 		"outputDir": "data/output"
 	},
 	"integrator": {
-		"sourceDir:"data/output",
+		"sourceDir": "data/output",
 		"awsAccessKeyId": "",
 		"awsSecretKey": "",
 		"bucketName": ""

@@ -96,7 +96,13 @@ public class Geogaddi {
             }
             
             if (all || integrate) {
-            	Integrator.integrate(propertiesManager.getCredentials(), propertiesManager.getDestinatonDir(), propertiesManager.getBucketName(), clean);
+            	String destDir;
+            	if (!all && !transform) {
+            		destDir = propertiesManager.getIntegratorSourceDir();
+            	} else {
+            		destDir = propertiesManager.getDestinatonDir();
+            	}
+            	Integrator.integrate(propertiesManager.getCredentials(), destDir, propertiesManager.getBucketName(), clean);
             }
             
         } catch (ParseException | IOException ex) {

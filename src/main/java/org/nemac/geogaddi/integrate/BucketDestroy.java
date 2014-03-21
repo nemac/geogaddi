@@ -17,18 +17,19 @@ import com.amazonaws.services.s3.model.VersionListing;
  * given key. This is done in an efficient multi-threaded ExecutorService
  * environment
  * 
- * 
+ * @author Jeff Hicks
  * @author Maxim Veksler <maxim@vekslers.org>
  * @author Mark S. Kolich 
  * http://mark.koli.ch/2010/09/recursively-deleting-large-amazon-s3-buckets.html
  * @version 0.1 - First pseudo code version, Written by Mark S. Kolich.
  * @version 0.2 - Maxim Veksler - Fix paging. Implement deletion of versioned keys.
+ * @version 0.3 - Jeff Hicks - Modified to empty bucket instead of delete it. Takes an S3 object as input.
  * 
  */
 
 public class BucketDestroy {
 
-	public static void destroyBucket(final AmazonS3 s3, final String bucketName) {
+	public static void emptyBucket(final AmazonS3 s3, final String bucketName) {
 		// Set up a new thread pool to delete 20 objects at a time.
 		ExecutorService _pool = Executors.newFixedThreadPool(20);
 
@@ -72,13 +73,6 @@ public class BucketDestroy {
 
 		_pool.shutdown();
 
-		try {
-			System.out.println("Deleting bucket " + bucketName);
-			s3.deleteBucket(bucketName);
-			System.out.println("... bucket " + bucketName	+ " deleted");
-		} catch (Exception e) {
-			System.err.println("Failed to ultimately delete bucket: " + bucketName);
-			e.printStackTrace();
-		}
+		System.out.println("... bucket " + bucketName	+ " emptied");
 	}
 }

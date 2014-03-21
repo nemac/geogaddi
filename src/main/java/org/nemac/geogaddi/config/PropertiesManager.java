@@ -28,6 +28,7 @@ public class PropertiesManager {
     private int folderIdx;
     private int fileIdx;
     private int[] dataIdxArr;
+    private String integratorSourceDir;
     private BasicAWSCredentials credentials;
     private String bucketName;
 
@@ -70,6 +71,7 @@ public class PropertiesManager {
     	p.dataIdxArr = dataIdxArr;
     	
     	// integrator
+    	p.integratorSourceDir = properties.getProperty("integrator.source.dir");
     	p.credentials = new BasicAWSCredentials(properties.getProperty("integrator.s3.accesskeyid"), properties.getProperty("integrator.s3.secretkey"));
     	p.bucketName = properties.getProperty("integrator.s3.bucket.name");
     	
@@ -117,6 +119,7 @@ public class PropertiesManager {
     	
     	// integrator
     	JSONObject integratorNode = rootNode.getJSONObject("integrator");
+    	p.integratorSourceDir = integratorNode.getString("sourceDir");
     	p.credentials = new BasicAWSCredentials(integratorNode.getString("awsAccessKeyId"), integratorNode.getString("awsSecretKey"));
     	p.bucketName = integratorNode.getString("bucketName");
     	
@@ -161,6 +164,10 @@ public class PropertiesManager {
 	
 	public String getProperty(String key) {
 		return properties.getProperty(key);
+	}
+	
+	public String getIntegratorSourceDir() {
+		return integratorSourceDir;
 	}
 	
 	public BasicAWSCredentials getCredentials() {
