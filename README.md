@@ -283,7 +283,7 @@ See [this link](https://docs.aws.amazon.com/AmazonS3/latest/dev/website-hosting-
 
 ###0.2
 - (RD) Use GZ end to end
-	- (C) Then enable S3 GZ content-encoding header in integrator
+	- (JH) Then enable S3 GZ content-encoding header in integrator
 - (RD) Add all new JSON properties to Java properties format handler
 
 ###0.3
