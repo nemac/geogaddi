@@ -30,16 +30,15 @@ public class Integrator {
             BucketDestroy.emptyBucket(s3, bucketName);
         }
 
-		// TODO: after write GZ to S3, add metadataProvider to uploadDirectory args
-		/*
-         ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
-         @Override
-         public void provideObjectMetadata(File file, ObjectMetadata metadata) {
-         metadata.setHeader("content-encoding", "gzip");
-         }
-         };
-         */
+        ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
+            @Override
+            public void provideObjectMetadata(File file, ObjectMetadata metadata) {
+                metadata.setHeader("content-encoding", "gzip");
+            }
+        };
+
         TransferManager transfer = new TransferManager(s3);
+        // TODO: after write GZ to S3, add metadataProvider as last uploadDirectory arg
         transfer.uploadDirectory(bucketName, null, new File(sourceDir), true).addProgressListener(new ProgressListener() {
             @Override
             public void progressChanged(ProgressEvent progressEvent) {

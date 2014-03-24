@@ -9,13 +9,14 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
+import org.nemac.geogaddi.parcel.summary.Summarizer;
 
 public class Writer {
 
     private static final String outputPattern = "%s/%s/%s.csv";
 
     // TODO: use uncompress flag to optionally work with gzipped files
-    public static void write(Map<String, Map<String, Set<String>>> parcelMap, String destDirPath, boolean uncompress) throws IOException {
+    public static void write(Map<String, Map<String, Set<String>>> parcelMap, String destDirPath, boolean uncompress, Summarizer summarizer) throws IOException {
         destDirPath = conformDirectoryString(destDirPath);
         System.out.println("Writing to " + destDirPath);
 
@@ -25,6 +26,9 @@ public class Writer {
             for (Map.Entry<String, Set<String>> fileEntry : fileHash.entrySet()) {
                 File destFile = new File(String.format(outputPattern, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
                 destFile.getParentFile().mkdirs();
+                
+                // insert to summary
+                summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), fileEntry.getValue());
 
                 if (destFile.exists()) {
                     // scan and compare duplicate lines between the file and the hash
@@ -32,7 +36,7 @@ public class Writer {
                     // remove duplicates from hash
                     List<String> hashedList = new ArrayList<String>(fileEntry.getValue());
                     hashedList.removeAll(sourceList);
-
+                                        
                     // check last element of source list to see if it should come before new item hash
                     if (!sourceList.isEmpty() && !hashedList.isEmpty() && sourceList.get(sourceList.size() - 1).compareTo(hashedList.get(0)) > 0) {
                         System.out.println("... backlog data detected, rebuilding output");
@@ -41,7 +45,7 @@ public class Writer {
                         writeSet.addAll(hashedList);
                         FileUtils.writeLines(destFile, writeSet);
                     } else {
-                        if (hashedList.size() == 0) {
+                        if (hashedList.isEmpty()) {
                             System.out.println("... skipping " + destFile + " - all entries are duplicates");
                         } else {
                             //System.out.print("... appending new lines to the end");
@@ -57,9 +61,9 @@ public class Writer {
         System.out.println("... data written to the CSVs");
     }
 
-    private static final String conformDirectoryString(String directoryString) {
+    private static String conformDirectoryString(String directoryString) {
         String lastChar = directoryString.substring(directoryString.length() - 1);
-        if (lastChar == "/") {
+        if (lastChar.equals("/")) {
             return directoryString.substring(0, directoryString.length() - 1);
         } else {
             return directoryString;

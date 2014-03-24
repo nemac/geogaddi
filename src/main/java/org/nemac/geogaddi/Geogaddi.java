@@ -20,6 +20,7 @@ import org.nemac.geogaddi.config.PropertiesManager;
 import org.nemac.geogaddi.fetch.Fetcher;
 import org.nemac.geogaddi.integrate.Integrator;
 import org.nemac.geogaddi.parcel.Parceler;
+import org.nemac.geogaddi.parcel.summary.Summarizer;
 import org.nemac.geogaddi.write.Writer;
 
 public class Geogaddi {
@@ -94,18 +95,23 @@ public class Geogaddi {
                     }
                 }
 
+                Summarizer summarizer = new Summarizer();
+                
                 for (String csvSource : csvSources) {
                     Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource,
                             props.getDestinatonDir(), props.getWhiteListSource(), props.getWhiteListIdx(),
                             props.getFolderIdx(), props.getFileIdx(), props.getDataIdxArr(), uncompressFetcher);
 
-                    Writer.write(parcelMap, props.getDestinatonDir(), uncompressParceler);
+                    Writer.write(parcelMap, props.getDestinatonDir(), uncompressParceler, summarizer);
 
                     // clean up downloaded file
                     if (cleanFetcherSource) {
                         FileUtils.deleteQuietly(new File(csvSource));
                     }
                 }
+                
+                // write out summary
+                FileUtils.writeStringToFile(new File(props.getDestinatonDir() + "/summary.json"), summarizer.jsonSummary());
             }
 
             if (all || integrate) {

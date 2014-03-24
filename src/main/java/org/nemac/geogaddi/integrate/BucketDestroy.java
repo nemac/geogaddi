@@ -1,5 +1,6 @@
 package org.nemac.geogaddi.integrate;
 
+import com.amazonaws.AmazonClientException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +50,7 @@ public class BucketDestroy {
                             keyName = objectSummary.getKey();
                             versionId = objectSummary.getVersionId();
                             s3.deleteVersion(new DeleteVersionRequest(bucketName, keyName, versionId));
-                        } catch (Exception e) {
+                        } catch (AmazonClientException e) {
                             String err = ">>>> FAILED delete: (" + bucketName + "/" + keyName + "@" + versionId + ")";
                             System.err.println(err);
                         } finally {
@@ -59,12 +60,12 @@ public class BucketDestroy {
                 });
             }
 
-			// After sending current batch of delete tasks we block until Latch
+            // After sending current batch of delete tasks we block until Latch
             // reaches zero, this allows to not over populate ExecutorService tasks queue.
             try {
                 latch.await();
-            } catch (Exception exception) {
-
+            } catch (InterruptedException exception) {
+                System.err.println(exception);
             }
 
             // Paging over all S3 keys...
