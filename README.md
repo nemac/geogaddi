@@ -1,6 +1,6 @@
 # Geogaddi
 
-Geogaddi is a command-line tool that parses and transforms CSV data. It separates out large CSV data aggregates that are sliced in one way into many smaller CSVs that may be sliced another way to be used by client map applications asynchronously.
+Geogaddi is a command-line tool that parses and transforms CSV data. It separates out large CSV data aggregates sliced one way into many smaller CSVs sliced another way and to be used by client map applications asynchronously.
 Initially, Geogaddi has been built with retrieving and parsing GHCND data in mind.
 The GHCND source files are hundreds of individual files separated by year (going back to 1763) and are updated daily with the latest data.
 Usually only the current year file has data appended, but occasionally data may be revised from new models or missing values may be added.
@@ -59,6 +59,7 @@ where the file min and max are the minimum and maximum values of the first data 
 Most typically for the above format, a FOLDER will be a station (e.g., USC00273626), a FILE will be some variable (e.g., TMIN), and the min and max variables will represent the beginning and end dates respectively of data contained in the file (e.g., "min": "20000101", "max": "20140324").
 But these examples are just one configuration. All folder, file, and contents arrangements can be defined in the properties, as described below.
 
+The parceled files do not have to be overwritten on update, but are usually appended to as new data arrive. Additionally, a module is provided to push all of the files to S3 to make them publicly available for map viewers and other clients.
 
 ## Dependencies
 - Java
@@ -223,8 +224,8 @@ Whereas this same block in the second example properties would look like:
 
 Therefore, it usually makes the most sense to have date (or something equally meaningful) output in the first column.
 
-###Working with AWS S3
-Some things to note to get this to work correctly with S3.
+###Integrating with AWS S3
+Some things to note when integrating with S3.
 
 ####Integrator permissions
 1. Set up the credentials as [described here](http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/java-dg-setup.html). 
@@ -254,7 +255,7 @@ Some things to note to get this to work correctly with S3.
 ```
 
 ####CORS configuration
-Even if the bucket contents are public, any machines attempting to access the files will run into issues with cross-origin resources. To resolve:
+Even if the bucket contents are public, any machines attempting to access the files are likely to run into permission issues with cross-origin resources. To resolve:
 
 1. Go to S3 Management Console
 2. Select the bucket -> Properties
