@@ -159,11 +159,11 @@ Therefore, it usually makes the most sense to have date (or something equally me
 ###Working with AWS S3
 Some things to note to get this to work correctly with S3.
 
+####Integrator permissions
 1. Set up the credentials as [described here](http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/java-dg-setup.html). 
 2. In the IAM console, also explicitly give Amazon S3 Full Access permissions to the user with the generated credentials. Administrator Access is not sufficient!
 
-To make the bucket contents public:
-
+####Making bucket public
 1. Go to S3 Management Console
 2. Select the bucket -> Properties
 3. Permissions -> Add (or Edit) bucket policy
@@ -186,6 +186,7 @@ To make the bucket contents public:
 }
 ```
 
+####CORS configuration
 Even if the bucket contents are public, any machines attempting to access the files will run into issues with cross-origin resources. To resolve:
 
 1. Go to S3 Management Console
@@ -205,6 +206,7 @@ Even if the bucket contents are public, any machines attempting to access the fi
 </CORSConfiguration>
 ```
 
+####DNS mapping
 See [this link](https://docs.aws.amazon.com/AmazonS3/latest/dev/website-hosting-custom-domain-walkthrough.html) for mapping S3 to a custom domain name.
 
 ## Todo
