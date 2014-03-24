@@ -141,7 +141,7 @@ If "override" is set to true in the properties file, this is all that's required
 		"uncompress": false, // currently unused
 		"cleanSource": false, // will delete the parceler source once it is done reading the files
 		"cleanDestination": false, // will clear the output directory before writing
-		"existingFromIntegrator": false // currently unused
+		"existingFromIntegrator": false, // currently unused
 		"sourceCsv": [
 			// list of CSVs used for a transform operation, if the fetcher is not used
 		],
@@ -154,7 +154,7 @@ If "override" is set to true in the properties file, this is all that's required
 	},
 	"integrator": {
 		"enabled": false, // will use the integrator
-		"cleanSource": false // currently unused
+		"cleanSource": false, // currently unused
 		"awsAccessKeyId": "", // AWS access Key ID - see notes below
 		"awsSecretKey": "", // AWS secret key - see notes below
 		"bucketName": "" // AWS S3 bucket, will create if it doesn't exist; policies are not applied
