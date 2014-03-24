@@ -1,6 +1,6 @@
 {
 	"override": true,
-	"useAll": true,
+	"useAll": false,
 	"fetcher": {
 		"enabled": true,
 		"uncompress": false,
@@ -17,8 +17,8 @@
 		"cleanDestination": false,
 		"existingFromIntegrator": true,
 		"sourceCsv": [
-			"data/dump/1763.csv",
-			"data/dump/1764.csv"
+			"data/dump/1763.csv.gz",
+			"data/dump/1764.csv.gz"
 		],
 		"whiteList": "",
 		"whiteListIndex": 0,
@@ -28,7 +28,7 @@
 		"outputDir": "data/output"
 	},
 	"integrator": {
-		"enabled": true,
+		"enabled": false,
 		"cleanSource":false,
 		"sourceDir": "data/output",
 		"awsAccessKeyId": "",
