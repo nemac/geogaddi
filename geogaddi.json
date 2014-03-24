@@ -14,7 +14,7 @@
 		"enabled": true,
 		"uncompress": false,
 		"cleanSource": false,
-		"cleanDestination": false,
+		"cleanDestination": true,
 		"existingFromIntegrator": true,
 		"sourceCsv": [
 			"data/dump/1763.csv.gz",
