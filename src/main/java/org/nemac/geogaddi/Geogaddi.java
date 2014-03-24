@@ -23,14 +23,14 @@ import org.nemac.geogaddi.parcel.Parceler;
 import org.nemac.geogaddi.write.Writer;
 
 public class Geogaddi {
-    
+
     private static PropertiesManager props;
-    
+
     // command-line util
     public static void main(String args[]) {
-    	long start = System.currentTimeMillis();
-    	
-    	// command-line args
+        long start = System.currentTimeMillis();
+
+        // command-line args
         Options options = new Options();
         options.addOption("a", false, "Runs the fetch, transform, and integrator operations");
         options.addOption("f", false, "Runs only the fetch operation");
@@ -44,93 +44,93 @@ public class Geogaddi {
         Option jsonArg = new Option("j", true, "Defines the override properties for Geogaddi operations in JSON format");
         jsonArg.setArgs(1);
         options.addOption(jsonArg);
-        
+
         CommandLineParser parser = new BasicParser();
         try {
             CommandLine cmd = parser.parse(options, args);
-            
+
             if (cmd.hasOption("p")) {
-            	String propertiesLocation = cmd.getOptionValues("p")[0];
+                String propertiesLocation = cmd.getOptionValues("p")[0];
                 props = PropertiesManager.createFromPropertiesFile(propertiesLocation);
             } else if (cmd.hasOption("j")) {
-            	String propertiesLocation = cmd.getOptionValues("j")[0];
-            	props = PropertiesManager.createFromJSON(propertiesLocation);
+                String propertiesLocation = cmd.getOptionValues("j")[0];
+                props = PropertiesManager.createFromJSON(propertiesLocation);
             }
-            
+
             boolean all = (props.isOverride() && props.isUseAll()) || cmd.hasOption("a");
             boolean fetch = (props.isOverride() && props.isFetcherEnabled()) || cmd.hasOption("f");
             boolean transform = (props.isOverride() && props.isParcelerEnabled()) || cmd.hasOption("t");
             boolean integrate = (props.isOverride() && props.isIntegratorEnabled()) || cmd.hasOption("i");
-            
+
             // fetcher
             boolean uncompressFetcher = (props.isOverride() && props.isFetcherUncompress()) || (!props.isOverride() && cmd.hasOption("u"));
             boolean cleanFetcherSource = props.isParcelerCleanSource();
             boolean cleanDestinationBeforeWrite = (props.isOverride() && props.isParcelerCleanDestination()) || (!props.isOverride() && cmd.hasOption("c"));
-            
+
             // TODO: implement these
             boolean uncompressParceler = (props.isOverride() && props.isParcelerUncompress()) || (!props.isOverride() && cmd.hasOption("u"));
             boolean existingSourcesFromIntegrator = props.isOverride() && props.isParcelerExistingFromIntegrator();
             boolean cleanIntegratorSource = props.isIntegratorCleanSource();
-            
+
             List<String> csvSources = new ArrayList<String>();
-            
+
             if (all || fetch) {
                 csvSources = Fetcher.multiFetch(props.getFetchUrls(), props.getDumpDir(), uncompressFetcher);
             }
-            
+
             if (all || transform) {
-            	// check if there is output from the previous step
-            	if (csvSources.isEmpty()) {
-            		csvSources = props.getParcelerSources();
-            	}
-            	
-            	if (cleanDestinationBeforeWrite) {
-            		File destDir = new File(props.getDestinatonDir());
-            		
-            		if (cleanDestinationBeforeWrite && destDir.exists()) {
-            			System.out.println("Cleaning directory " + props.getDestinatonDir());
-            			FileUtils.cleanDirectory(destDir);
-            			System.out.println("... directory cleaned");
-            		}
-            	}
-            	
-            	for (String csvSource : csvSources) {
-            		Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource, 
-            				props.getDestinatonDir(), props.getWhiteListSource(), props.getWhiteListIdx(), 
-            				props.getFolderIdx(), props.getFileIdx(), props.getDataIdxArr(), uncompressFetcher);
-            		
-            		Writer.write(parcelMap, props.getDestinatonDir(), uncompressParceler);
-            		
-            		// clean up downloaded file
-            		if (cleanFetcherSource) {
-            			FileUtils.deleteQuietly(new File(csvSource));
-            		}
-            	}
+                // check if there is output from the previous step
+                if (csvSources.isEmpty()) {
+                    csvSources = props.getParcelerSources();
+                }
+
+                if (cleanDestinationBeforeWrite) {
+                    File destDir = new File(props.getDestinatonDir());
+
+                    if (cleanDestinationBeforeWrite && destDir.exists()) {
+                        System.out.println("Cleaning directory " + props.getDestinatonDir());
+                        FileUtils.cleanDirectory(destDir);
+                        System.out.println("... directory cleaned");
+                    }
+                }
+
+                for (String csvSource : csvSources) {
+                    Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource,
+                            props.getDestinatonDir(), props.getWhiteListSource(), props.getWhiteListIdx(),
+                            props.getFolderIdx(), props.getFileIdx(), props.getDataIdxArr(), uncompressFetcher);
+
+                    Writer.write(parcelMap, props.getDestinatonDir(), uncompressParceler);
+
+                    // clean up downloaded file
+                    if (cleanFetcherSource) {
+                        FileUtils.deleteQuietly(new File(csvSource));
+                    }
+                }
             }
-            
+
             if (all || integrate) {
-            	String destDir;
-            	if (!all && !transform) {
-            		destDir = props.getIntegratorSourceDir();
-            	} else {
-            		destDir = props.getDestinatonDir();
-            	}
-            	
-            	Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite);
-            	
+                String destDir;
+                if (!all && !transform) {
+                    destDir = props.getIntegratorSourceDir();
+                } else {
+                    destDir = props.getDestinatonDir();
+                }
+
+                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite);
+
             	// Implement once figure out integrator blocking, etc
             	/*
-            	if (cleanIntegratorSource) {
-            		FileUtils.deleteDirectory(new File(destDir));
-            	}
-            	*/
+                 if (cleanIntegratorSource) {
+                 FileUtils.deleteDirectory(new File(destDir));
+                 }
+                 */
             }
-            
+
         } catch (ParseException | IOException ex) {
             Logger.getLogger(Geogaddi.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         long end = System.currentTimeMillis();
-        System.out.println("Processed in " + (end-start)/1000f + " seconds");
+        System.out.println("Processed in " + (end - start) / 1000f + " seconds");
     }
 }
