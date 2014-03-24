@@ -26,6 +26,8 @@ An executable JAR with dependencies will deploy to the target/ directory.
 | -p   | path/to/geogaddi.properties | location of Java-formatted properties file                                            |
 | -j   | path/to/geogaddi.json       | location of JSON properties file                                                      |
 
+Note: if the properties are set to override, only the -j or -p flags will be used. The remaining options will be driven from the properties file.
+
 ####Examples
 Some example usages: 
 ```shell
@@ -58,13 +60,22 @@ Will perform a transform operation on the CSVs defined in the Java-format proper
 ###Properties (JSON format)
 ```json
 {
+	"override": true, // the operation will be driven from the properties file, only -j or -p flags are used
+	"useAll": false, // the operation will perform all steps, overrides individual element booleans
 	"fetcher": {
+		"enabled": true, // will use the fetcher
+		"uncompress": false, // if true, will uncompress the fetched file and clean up the downloaded .gz
 		"source": [
 			// array of URLs of gzipped CSVs to download
 		],
 		"dumpDir": "data/dump" // directory where the fetcher should download the data
 	},
 	"parceler": {
+		"enabled": true, // will use the parceler,
+		"uncompress": false, // currently unused
+		"cleanSource": false, // will delete the parceler source once it is done reading the files
+		"cleanDestination": false, // will clear the output directory before writing
+		"existingFromIntegrator": false // currently unused
 		"sourceCsv": [
 			// list of CSVs used for a transform operation, if the fetcher is not used
 		],
@@ -76,6 +87,8 @@ Will perform a transform operation on the CSVs defined in the Java-format proper
 		"outputDir": "data/output" // path to output from the transform operation
 	},
 	"integrator": {
+		"enabled": false, // will use the integrator
+		"cleanSource": false // currently unused
 		"awsAccessKeyId": "", // AWS access Key ID - see notes below
 		"awsSecretKey": "", // AWS secret key - see notes below
 		"bucketName": "" // AWS S3 bucket, will create if it doesn't exist; policies are not applied
@@ -149,7 +162,13 @@ Some things to note to get this to work correctly with S3.
 1. Set up the credentials as [described here](http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/java-dg-setup.html). 
 2. In the IAM console, also explicitly give Amazon S3 Full Access permissions to the user with the generated credentials. Administrator Access is not sufficient!
 
-To make the bucket contents public, set the following bucket policy from the S3 console
+To make the bucket contents public:
+
+1. Go to S3 Management Console
+2. Select the bucket -> Properties
+3. Permissions -> Add (or Edit) bucket policy
+4. Set some variant of the following policy:
+
 ```json
 {
   "Version":"2012-10-17",
@@ -167,7 +186,59 @@ To make the bucket contents public, set the following bucket policy from the S3 
 }
 ```
 
+Even if the bucket contents are public, any machines attempting to access the files will run into issues with cross-origin resources. To resolve:
+
+1. Go to S3 Management Console
+2. Select the bucket -> Properties
+3. Permissions -> Add (or Edit) CORS Configuration
+4. Set some variant of the following configuration:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+    <CORSRule>
+        <AllowedOrigin>*</AllowedOrigin>
+        <AllowedMethod>GET</AllowedMethod>
+        <MaxAgeSeconds>3000</MaxAgeSeconds>
+        <AllowedHeader>Authorization</AllowedHeader>
+    </CORSRule>
+</CORSConfiguration>
+```
+
+See [this link](https://docs.aws.amazon.com/AmazonS3/latest/dev/website-hosting-custom-domain-walkthrough.html) for mapping S3 to a custom domain name.
+
 ## Todo
 ### 0.1
-- Exit program cleanly when using integrator
-- Block bucket destruction, then create
+- (RD) Exit program cleanly when using integrator
+
+###0.2
+- (RD) Use GZ end to end
+	- (C) Then enable S3 GZ content-encoding header in integrator
+- (RD) Add all new JSON properties to Java properties format handler
+
+###0.3
+- If needed (i.e., if the current architecture becomes costly), add option to get backlog update source from S3 as opposed to relying on the machine hosting the script to maintain a copy of the output
+	- **CURRENT ARCHITECTURE**
+		1. EBS (or script runner disk) contains:
+			- operating system
+			- Java
+			- script
+			- at least the fully parceled output data product snapshot
+		2. EC2 (or script runner) spools up to process the updates, reading EBS (or logical disk)
+		3. downloads update from NCDC
+		4. hashes the entire update from NCDC and updates the entire local output data product snapshot with new values from downloaded update
+		5. transfers the entire local snapshot to S3
+	- **FUTURE ARCHITECTURE**
+		1. EBS (or script runner disk) contains:
+			- operating system
+			- Java
+			- script
+		2. EC2 (or script runner) spools up to process the updates, reading EBS (or logical disk)
+		2. downloads update from NCDC
+		4. hashes the entire update from NCDC, loops through the hash and
+			1. makes local copy of each S3 file
+			2. updates file locally
+			3. pushes to S3
+			
+###n.n
+- If S3 supports appending to files, take advantage of it (currently not possible)
