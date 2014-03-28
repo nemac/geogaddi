@@ -43,7 +43,11 @@ public class Integrator {
             ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
                 @Override
                 public void provideObjectMetadata(File file, ObjectMetadata metadata) {
-                    metadata.setHeader("content-encoding", "gzip");
+                    if (file.getName().contains(".gz")) {
+                        metadata.setHeader("content-encoding", "gzip");
+                        metadata.setContentType("application/octet-stream");
+                    }
+                    
                 }
             };
             

@@ -16,7 +16,6 @@ public class Utils {
     public static String uncompress(String sourceFileName, String destDir) throws IOException {
         int suffixDelimiterPosition = sourceFileName.lastIndexOf(COMPRESSION_EXTENSION);
         String outputFileName = sourceFileName.substring(0, suffixDelimiterPosition);
-        System.out.println("Unzipping " + sourceFileName + " to " + outputFileName);
 
         File sourceFile = new File(String.format(filePattern, destDir, sourceFileName));
         GZIPInputStream inputZip = new GZIPInputStream(new FileInputStream(sourceFile));
@@ -34,13 +33,11 @@ public class Utils {
         // cleanup source zip
         FileUtils.forceDelete(sourceFile);
 
-        System.out.println("... unzip complete");
         return outputFileName;
     }
     
     public static String compress(String sourceFileName) throws IOException {
         String outputFileName = sourceFileName + COMPRESSION_EXTENSION;
-        System.out.println("Zipping" + sourceFileName + " to " + outputFileName);
         
         File sourceFile = new File(sourceFileName);
         
@@ -59,7 +56,6 @@ public class Utils {
         // cleanup source file
         FileUtils.forceDelete(sourceFile);
         
-        System.out.println("... zip complete");
         return outputFileName;
     }
     
