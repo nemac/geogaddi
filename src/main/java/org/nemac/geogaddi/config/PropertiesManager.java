@@ -33,9 +33,11 @@ public class PropertiesManager {
     private boolean parcelerExistingFromIntegrator;
     private List<String> parcelerSources;
     private String parcelerDestinatonDir;
-    private String parcelerWhiteListSource;
-    private int parcelerWhiteListIdx;
+    private String parcelerFolderWhiteListSource;
+    private int parcelerFolderWhiteListIdx;
     private int parcelerFolderIdx;
+    private String parcelerFileWhiteListSource;
+    private int parcelerFileWhiteListIdx;
     private int parcelerFileIdx;
     private int[] parcelerDataIdxArr;
     private boolean integratorEnabled;
@@ -71,8 +73,8 @@ public class PropertiesManager {
         p.parcelerSources = Arrays.asList(sourceCSVProperty.replace(" ", "").split(","));
 
         p.parcelerDestinatonDir = props.getProperty("parceler.output.dir");
-        p.parcelerWhiteListSource = props.getProperty("parceler.parcel.whitelist.source");
-        p.parcelerWhiteListIdx = new Integer(props.getProperty("parceler.parcel.whitelist.filter.index"));
+        p.parcelerFolderWhiteListSource = props.getProperty("parceler.parcel.whitelist.source");
+        p.parcelerFolderWhiteListIdx = new Integer(props.getProperty("parceler.parcel.whitelist.filter.index"));
         p.parcelerFolderIdx = new Integer(props.getProperty("parceler.parce.folder.index"));
         p.parcelerFileIdx = new Integer(props.getProperty("parceler.parce.file.index"));
         String dataIdxProperty = props.getProperty("parceler.parce.data.index");
@@ -128,9 +130,11 @@ public class PropertiesManager {
         }
         p.parcelerSources = parcelerSources;
         p.parcelerDestinatonDir = Utils.conformDirectoryString(parcelerNode.getString("outputDir"));
-        p.parcelerWhiteListSource = parcelerNode.getString("whiteList");
-        p.parcelerWhiteListIdx = (int) parcelerNode.getLong("whiteListIndex");
+        p.parcelerFolderWhiteListSource = parcelerNode.getString("folderWhiteList");
+        p.parcelerFolderWhiteListIdx = (int) parcelerNode.getLong("folderWhiteListIndex");
         p.parcelerFolderIdx = (int) parcelerNode.getLong("folderIndex");
+        p.parcelerFileWhiteListSource = parcelerNode.getString("fileWhiteList");
+        p.parcelerFileWhiteListIdx = (int) parcelerNode.getLong("fileWhiteListIndex");
         p.parcelerFileIdx = (int) parcelerNode.getLong("fileIndex");
 
         JSONArray dataIndexes = parcelerNode.getJSONArray("dataIndex");
@@ -213,16 +217,24 @@ public class PropertiesManager {
         return parcelerDestinatonDir;
     }
 
-    public String getWhiteListSource() {
-        return parcelerWhiteListSource;
+    public String getFolderWhiteListSource() {
+        return parcelerFolderWhiteListSource;
     }
 
-    public int getWhiteListIdx() {
-        return parcelerWhiteListIdx;
+    public int getFolderWhiteListIdx() {
+        return parcelerFolderWhiteListIdx;
     }
 
     public int getFolderIdx() {
         return parcelerFolderIdx;
+    }
+    
+    public String getFileWhiteListSource() {
+        return parcelerFileWhiteListSource;
+    }
+    
+    public int getFileWhiteListIdx() {
+        return parcelerFileWhiteListIdx;
     }
 
     public int getFileIdx() {

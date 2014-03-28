@@ -19,9 +19,10 @@ import au.com.bytecode.opencsv.CSVReader;
 
 public class Parceler {
 
-    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed) throws IOException {
-        Set<String> whiteList = buildWhitelist(whiteListSource);
-        return hashSourceData(csvSource, whiteList, whiteListIdx, folderIdx, fileIdx, dataIdxArr, isSourceUncompressed);
+    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String folderWhiteListSource, int folderWhiteListIdx, int folderIdx, String fileWhiteListSource, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed) throws IOException {
+        Set<String> folderWhiteList = buildWhitelist(folderWhiteListSource);
+        Set<String> fileWhiteList = buildWhitelist(fileWhiteListSource);
+        return hashSourceData(csvSource, folderWhiteList, folderWhiteListIdx, folderIdx, fileWhiteList, fileWhiteListIdx, fileIdx, dataIdxArr, isSourceUncompressed);
     }
 
     private static Set<String> buildWhitelist(String whiteListSource) throws IOException {
@@ -46,7 +47,7 @@ public class Parceler {
         return whiteList;
     }
 
-    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> whiteList, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed) throws IOException {
+    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> folderWhiteList, int folderWhiteListIdx, int folderIdx, Set<String> fileWhiteList, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed) throws IOException {
     	// The data are hashed as follows
         // Map
         // 	String -> Folder
@@ -68,7 +69,11 @@ public class Parceler {
         String[] nextLine;
         while ((nextLine = dataReader.readNext()) != null) {
             // compare to whitelist - check if whitelist isn't empty and doesn't contain the current key 
-            if (!whiteList.isEmpty() && !whiteList.contains(nextLine[whiteListIdx])) {
+            if (!folderWhiteList.isEmpty() && !folderWhiteList.contains(nextLine[folderWhiteListIdx])) {
+                continue;
+            }
+            
+            if (!fileWhiteList.isEmpty() && !fileWhiteList.contains(nextLine[fileWhiteListIdx])) {
                 continue;
             }
 

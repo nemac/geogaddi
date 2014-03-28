@@ -99,8 +99,9 @@ public class Geogaddi {
                 
                 for (String csvSource : csvSources) {
                     Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource,
-                            props.getDestinatonDir(), props.getWhiteListSource(), props.getWhiteListIdx(),
-                            props.getFolderIdx(), props.getFileIdx(), props.getDataIdxArr(), uncompressFetcher);
+                            props.getDestinatonDir(), props.getFolderWhiteListSource(), props.getFolderWhiteListIdx(),
+                            props.getFolderIdx(), props.getFileWhiteListSource(), props.getFileWhiteListIdx(), props.getFileIdx(), 
+                            props.getDataIdxArr(), uncompressFetcher);
 
                     Writer.write(parcelMap, props.getDestinatonDir(), uncompressParceler, summarizer);
 

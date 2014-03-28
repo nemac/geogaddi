@@ -20,9 +20,11 @@
 			"data/dump/1763.csv.gz",
 			"data/dump/1764.csv.gz"
 		],
-		"whiteList": "",
-		"whiteListIndex": 0,
+		"folderWhiteList": "stations.csv",
+		"folderWhiteListIndex": 0,
 		"folderIndex": 0,
+		"fileWhiteList": "vars.csv",
+		"fileWhiteListIndex": 2,
 		"fileIndex": 2,
 		"dataIndex": [1,3],
 		"outputDir": "data/output"
