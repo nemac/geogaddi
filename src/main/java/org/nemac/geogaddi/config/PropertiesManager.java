@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.amazonaws.auth.BasicAWSCredentials;
+import org.nemac.geogaddi.write.Utils;
 
 public class PropertiesManager {
 
@@ -112,7 +113,7 @@ public class PropertiesManager {
             fetchUrls.add(fetcherUrls.getString(i));
         }
         p.fetcherUrls = fetchUrls;
-        p.fetcherDumpDir = fetcherNode.getString("dumpDir");
+        p.fetcherDumpDir = Utils.conformDirectoryString(fetcherNode.getString("dumpDir"));
 
         // parceler
         JSONObject parcelerNode = rootNode.getJSONObject("parceler");
@@ -126,7 +127,7 @@ public class PropertiesManager {
             parcelerSources.add(sourceCsvs.getString(i));
         }
         p.parcelerSources = parcelerSources;
-        p.parcelerDestinatonDir = parcelerNode.getString("outputDir");
+        p.parcelerDestinatonDir = Utils.conformDirectoryString(parcelerNode.getString("outputDir"));
         p.parcelerWhiteListSource = parcelerNode.getString("whiteList");
         p.parcelerWhiteListIdx = (int) parcelerNode.getLong("whiteListIndex");
         p.parcelerFolderIdx = (int) parcelerNode.getLong("folderIndex");
@@ -145,7 +146,7 @@ public class PropertiesManager {
         JSONObject integratorNode = rootNode.getJSONObject("integrator");
         p.integratorEnabled = integratorNode.getBoolean("enabled");
         p.integratorCleanSource = integratorNode.getBoolean("cleanSource");
-        p.integratorSourceDir = integratorNode.getString("sourceDir");
+        p.integratorSourceDir = Utils.conformDirectoryString(integratorNode.getString("sourceDir"));
         p.integratorCredentials = new BasicAWSCredentials(integratorNode.getString("awsAccessKeyId"), integratorNode.getString("awsSecretKey"));
         p.integratorBucketName = integratorNode.getString("bucketName");
 

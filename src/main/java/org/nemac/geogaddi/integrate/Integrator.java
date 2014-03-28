@@ -15,7 +15,7 @@ import com.amazonaws.services.s3.transfer.TransferManager;
 
 public class Integrator {
 
-    public static void integrate(AWSCredentials credentials, String sourceDir, String bucketName, boolean clean) {
+    public static void integrate(AWSCredentials credentials, String sourceDir, String bucketName, boolean clean, boolean uncompressed) {
 
         System.out.println("Transferring content to S3");
 
@@ -30,21 +30,31 @@ public class Integrator {
             BucketDestroy.emptyBucket(s3, bucketName);
         }
 
-        ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
-            @Override
-            public void provideObjectMetadata(File file, ObjectMetadata metadata) {
-                metadata.setHeader("content-encoding", "gzip");
-            }
-        };
-
         TransferManager transfer = new TransferManager(s3);
-        // TODO: after write GZ to S3, add metadataProvider as last uploadDirectory arg
-        transfer.uploadDirectory(bucketName, null, new File(sourceDir), true).addProgressListener(new ProgressListener() {
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                System.out.println("... transferred bytes: " + progressEvent.getBytesTransferred());
-            }
-        });
+        
+        if (uncompressed) {
+            transfer.uploadDirectory(bucketName, null, new File(sourceDir), true).addProgressListener(new ProgressListener() {
+                @Override
+                public void progressChanged(ProgressEvent progressEvent) {
+                    System.out.println("... transferred bytes: " + progressEvent.getBytesTransferred());
+                }
+            });
+        } else {
+            ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
+                @Override
+                public void provideObjectMetadata(File file, ObjectMetadata metadata) {
+                    metadata.setHeader("content-encoding", "gzip");
+                }
+            };
+            
+            transfer.uploadDirectory(bucketName, null, new File(sourceDir), true, metadataProvider).addProgressListener(new ProgressListener() {
+                @Override
+                public void progressChanged(ProgressEvent progressEvent) {
+                    System.out.println("... transferred bytes: " + progressEvent.getBytesTransferred());
+                }
+            });
+        }
+
 
         System.out.println("... content transferred to S3");
     }

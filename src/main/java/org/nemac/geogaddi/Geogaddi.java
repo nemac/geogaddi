@@ -122,7 +122,7 @@ public class Geogaddi {
                     destDir = props.getDestinatonDir();
                 }
 
-                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite);
+                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite, uncompressParceler);
 
             	// Implement once figure out integrator blocking, etc
             	/*

@@ -13,26 +13,31 @@ import org.nemac.geogaddi.parcel.summary.Summarizer;
 
 public class Writer {
 
-    private static final String outputPattern = "%s/%s/%s.csv";
+    private static final String uncompressedOutputPattern = "%s/%s/%s.csv";
 
     // TODO: use uncompress flag to optionally work with gzipped files
-    public static void write(Map<String, Map<String, Set<String>>> parcelMap, String destDirPath, boolean uncompress, Summarizer summarizer) throws IOException {
-        destDirPath = conformDirectoryString(destDirPath);
+    public static void write(Map<String, Map<String, Set<String>>> parcelMap, String destDirPath, boolean uncompressed, Summarizer summarizer) throws IOException {
+        boolean compressed = !uncompressed;
         System.out.println("Writing to " + destDirPath);
 
         for (Map.Entry<String, Map<String, Set<String>>> folderEntry : parcelMap.entrySet()) {
             Map<String, Set<String>> fileHash = folderEntry.getValue();
 
             for (Map.Entry<String, Set<String>> fileEntry : fileHash.entrySet()) {
-                File destFile = new File(String.format(outputPattern, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
+                File destFile = new File(String.format(uncompressedOutputPattern, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
                 destFile.getParentFile().mkdirs();
+                
+                File useFile = destFile;
+                if (compressed && destFile.exists()) { // need to uncompress to read
+                    useFile = new File(Utils.uncompress(destFile.getName(), "/" + destDirPath));
+                }
                 
                 // insert to summary
                 summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), fileEntry.getValue());
 
                 if (destFile.exists()) {
                     // scan and compare duplicate lines between the file and the hash
-                    List<String> sourceList = FileUtils.readLines(destFile);
+                    List<String> sourceList = FileUtils.readLines(useFile);
                     // remove duplicates from hash
                     List<String> hashedList = new ArrayList<String>(fileEntry.getValue());
                     hashedList.removeAll(sourceList);
@@ -43,30 +48,26 @@ public class Writer {
                         Set<String> writeSet = new TreeSet<String>();
                         writeSet.addAll(sourceList);
                         writeSet.addAll(hashedList);
-                        FileUtils.writeLines(destFile, writeSet);
+                        FileUtils.writeLines(useFile, writeSet);
                     } else {
                         if (hashedList.isEmpty()) {
                             System.out.println("... skipping " + destFile + " - all entries are duplicates");
                         } else {
                             //System.out.print("... appending new lines to the end");
-                            FileUtils.writeLines(destFile, hashedList, true);
+                            FileUtils.writeLines(useFile, hashedList, true);
                         }
                     }
                 } else {
-                    FileUtils.writeLines(destFile, fileEntry.getValue());
+                    FileUtils.writeLines(useFile, fileEntry.getValue());
+                }
+                
+                // write out file as gz and delete temp
+                if (compressed) {
+                    Utils.compress(useFile.getCanonicalPath());
                 }
             }
         }
 
         System.out.println("... data written to the CSVs");
-    }
-
-    private static String conformDirectoryString(String directoryString) {
-        String lastChar = directoryString.substring(directoryString.length() - 1);
-        if (lastChar.equals("/")) {
-            return directoryString.substring(0, directoryString.length() - 1);
-        } else {
-            return directoryString;
-        }
     }
 }
