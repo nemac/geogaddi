@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.nemac.geogaddi.config;
 
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -11,51 +6,57 @@ import java.io.IOException;
 import java.util.List;
 
 public interface PropertiesManager {
+    
     PropertiesManager build() throws FileNotFoundException, IOException;
 
-    boolean isOverride();
+    String getBucketName();
 
-    boolean isUseAll();
+    BasicAWSCredentials getCredentials();
+
+    int[] getDataIdxArr();
+
+    String getDestinatonDir();
+
+    String getDumpDir();
+
+    List<String> getFetchUrls();
+
+    int getFileIdx();
+
+    int getFileWhiteListIdx();
+
+    String getFileWhiteListSource();
+
+    int getFolderIdx();
+
+    int getFolderWhiteListIdx();
+
+    String getFolderWhiteListSource();
+
+    String getIntegratorSourceDir();
+
+    List<String> getParcelerSources();
 
     boolean isFetcherEnabled();
 
     boolean isFetcherUncompress();
 
-    List<String> getFetchUrls();
-
-    String getDumpDir();
-
-    boolean isParcelerEnabled();
-
-    boolean isParcelerUncompress();
-
-    boolean isParcelerCleanSource();
-
-    boolean isParcelerCleanDestination();
-
-    boolean isParcelerExistingFromIntegrator();
-
-    List<String> getParcelerSources();
-
-    String getDestinatonDir();
-
-    String getWhiteListSource();
-
-    int getWhiteListIdx();
-
-    int getFolderIdx();
-
-    int getFileIdx();
-
-    int[] getDataIdxArr();
+    boolean isIntegratorCleanSource();
 
     boolean isIntegratorEnabled();
 
-    boolean isIntegratorCleanSource();
+    boolean isOverride();
 
-    String getIntegratorSourceDir();
+    boolean isParcelerCleanDestination();
 
-    BasicAWSCredentials getCredentials();
+    boolean isParcelerCleanSource();
 
-    String getBucketName();
+    boolean isParcelerEnabled();
+
+    boolean isParcelerExistingFromIntegrator();
+
+    boolean isParcelerUncompress();
+
+    boolean isUseAll();
+    
 }

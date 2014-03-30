@@ -31,7 +31,7 @@ public class Geogaddi {
     private static PropertiesManager props;
 
     // command-line util
-    public static void main(String args[]) {
+    public static void main(String args[]) throws InterruptedException {
         long start = System.currentTimeMillis();
 
         // command-line args
@@ -109,8 +109,9 @@ public class Geogaddi {
                 
                 for (String csvSource : csvSources) {
                     Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource,
-                            props.getDestinatonDir(), props.getWhiteListSource(), props.getWhiteListIdx(),
-                            props.getFolderIdx(), props.getFileIdx(), props.getDataIdxArr(), uncompressFetcher);
+                            props.getDestinatonDir(), props.getFolderWhiteListSource(), props.getFolderWhiteListIdx(),
+                            props.getFolderIdx(), props.getFileWhiteListSource(), props.getFileWhiteListIdx(), props.getFileIdx(), 
+                            props.getDataIdxArr(), uncompressFetcher);
 
                     Writer.write(parcelMap, props.getDestinatonDir(), uncompressParceler, summarizer);
 
@@ -132,7 +133,7 @@ public class Geogaddi {
                     destDir = props.getDestinatonDir();
                 }
 
-                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite);
+                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite, uncompressParceler);
 
             	// Implement once figure out integrator blocking, etc
             	/*

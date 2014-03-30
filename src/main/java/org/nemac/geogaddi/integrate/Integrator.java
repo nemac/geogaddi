@@ -16,9 +16,8 @@ import com.amazonaws.services.s3.transfer.ObjectMetadataProvider;
 import com.amazonaws.services.s3.transfer.TransferManager;
 
 public class Integrator {
-
-    public static void integrate(AWSCredentials credentials, String sourceDir, String bucketName, boolean clean) throws AmazonClientException, InterruptedException {
-
+    
+    public static void integrate(AWSCredentials credentials, String sourceDir, String bucketName, boolean clean, boolean uncompressed) throws AmazonClientException, InterruptedException  {
         System.out.println("Transferring content to S3");
 
         AmazonS3 s3 = new AmazonS3Client(credentials);
@@ -32,22 +31,27 @@ public class Integrator {
             BucketDestroy.emptyBucket(s3, bucketName);
         }
 
-        ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
-            @Override
-            public void provideObjectMetadata(File file, ObjectMetadata metadata) {
-                metadata.setHeader("content-encoding", "gzip");
-            }
-        };
-
         TransferManager transfer = new TransferManager(s3);
-        // TODO: after write GZ to S3, add metadataProvider as last uploadDirectory arg
-        MultipleFileUpload upload  = transfer.uploadDirectory(bucketName, null, new File(sourceDir), true);
-        upload.addProgressListener(new ProgressListener() {
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                System.out.println("... transferred bytes: " + progressEvent.getBytesTransferred());
-            }
-        });
+        
+        MultipleFileUpload upload;
+        if (uncompressed) {
+            upload  = transfer.uploadDirectory(bucketName, null, new File(sourceDir), true);
+        } else {
+            ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
+                @Override
+                public void provideObjectMetadata(File file, ObjectMetadata metadata) {
+                    if (file.getName().contains(".gz")) {
+                        metadata.setHeader("content-encoding", "gzip");
+                        metadata.setContentType("application/octet-stream");
+                    }
+                    
+                }
+            };
+            
+            upload = transfer.uploadDirectory(bucketName, null, new File(sourceDir), true, metadataProvider);
+        }
+        
+        upload.addProgressListener(new IntegratorProgressListener());
         
         upload.waitForCompletion();
         

@@ -1,7 +1,6 @@
 package org.nemac.geogaddi.fetch;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,17 +8,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
-
-import org.apache.commons.io.FileUtils;
+import org.nemac.geogaddi.write.Utils;
 
 public class Fetcher {
 
-    private static final String COMPRESSION_EXTENSION = ".gz";
-
     public static List<String> multiFetch(List<String> sourceUrlPaths, String destinationDirectory, boolean unzip) throws IOException {
         List<String> outputFiles = new ArrayList<String>();
-
         for (String sourceUrlPath : sourceUrlPaths) {
             outputFiles.add(fetch(sourceUrlPath, destinationDirectory, unzip));
         }
@@ -30,7 +24,7 @@ public class Fetcher {
     public static String fetch(String sourceUrlPath, String destinationDirectory, boolean unzip) throws IOException {
         String downloadedFilePath = download(sourceUrlPath, destinationDirectory);
         if (unzip) {
-            return destinationDirectory + unzip(downloadedFilePath, destinationDirectory);
+            return destinationDirectory + Utils.uncompress(downloadedFilePath, destinationDirectory);
         } else {
             return destinationDirectory + downloadedFilePath;
         }
@@ -60,36 +54,5 @@ public class Fetcher {
 
         System.out.println("... download complete");
         return outputFilePath;
-    }
-
-    private static String unzip(String source, String destinationDirectory) throws IOException {
-        return unzip(source, destinationDirectory, COMPRESSION_EXTENSION);
-    }
-
-    private static String unzip(String downloadedSourceZip, String destinationDirectory, String compressionExtension) throws IOException {
-        int suffixDelimiterPosition = downloadedSourceZip.lastIndexOf(compressionExtension);
-        String outputFileName = downloadedSourceZip.substring(0, suffixDelimiterPosition);
-        System.out.println("Unzipping " + downloadedSourceZip + " to " + outputFileName);
-
-        File downloadedSourceZipFile = new File(destinationDirectory + downloadedSourceZip);
-
-        GZIPInputStream inputZip = new GZIPInputStream(new FileInputStream(downloadedSourceZipFile));
-
-        byte[] buffer = new byte[4096];
-        FileOutputStream outputFile = new FileOutputStream(destinationDirectory + outputFileName);
-
-        int len;
-        while ((len = inputZip.read(buffer)) > 0) {
-            outputFile.write(buffer, 0, len);
-        }
-
-        inputZip.close();
-        outputFile.close();
-
-        // cleanup source zip
-        FileUtils.forceDelete(downloadedSourceZipFile);
-
-        System.out.println("... unzip complete");
-        return outputFileName;
     }
 }
