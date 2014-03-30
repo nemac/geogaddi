@@ -14,6 +14,7 @@ import org.nemac.geogaddi.parcel.summary.Summarizer;
 public class Writer {
 
     private static final String uncompressedOutputPattern = "%s/%s/%s.csv";
+    private static final String compressedOutputPattern = "%s/%s/%s.csv.gz";
 
     // TODO: use uncompress flag to optionally work with gzipped files
     public static void write(Map<String, Map<String, Set<String>>> parcelMap, String destDirPath, boolean uncompressed, Summarizer summarizer) throws IOException {
@@ -28,8 +29,11 @@ public class Writer {
                 destFile.getParentFile().mkdirs();
                 
                 File useFile = destFile;
-                if (compressed && destFile.exists()) { // need to uncompress to read
-                    useFile = new File(Utils.uncompress(destFile.getName(), "/" + destDirPath));
+                if (compressed) { // need to uncompress to read
+                    File compressedFile = new File(String.format(compressedOutputPattern, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
+                    if (compressedFile.exists()) {
+                        useFile = new File(Utils.uncompress(compressedFile.getCanonicalPath()));
+                    }
                 }
                 
                 // insert to summary

@@ -12,7 +12,6 @@ public class Utils {
     private static final String COMPRESSION_EXTENSION = ".gz";
     private static final String filePattern = "%s/%s";
     
-    // TODO expect full path like compress method
     public static String uncompress(String sourceFileName, String destDir) throws IOException {
         int suffixDelimiterPosition = sourceFileName.lastIndexOf(COMPRESSION_EXTENSION);
         String outputFileName = sourceFileName.substring(0, suffixDelimiterPosition);
@@ -20,6 +19,29 @@ public class Utils {
         File sourceFile = new File(String.format(filePattern, destDir, sourceFileName));
         GZIPInputStream inputZip = new GZIPInputStream(new FileInputStream(sourceFile));
         FileOutputStream outputFile = new FileOutputStream(String.format(filePattern, destDir, outputFileName));
+        
+        byte[] buffer = new byte[4096];
+        int len;
+        while ((len = inputZip.read(buffer)) > 0) {
+            outputFile.write(buffer, 0, len);
+        }
+
+        inputZip.close();
+        outputFile.close();
+
+        // cleanup source zip
+        FileUtils.forceDelete(sourceFile);
+
+        return outputFileName;
+    }
+    
+    public static String uncompress(String sourceFileName) throws IOException {
+        int suffixDelimiterPosition = sourceFileName.lastIndexOf(COMPRESSION_EXTENSION);
+        String outputFileName = sourceFileName.substring(0, suffixDelimiterPosition);
+
+        File sourceFile = new File(sourceFileName);
+        GZIPInputStream inputZip = new GZIPInputStream(new FileInputStream(sourceFile));
+        FileOutputStream outputFile = new FileOutputStream(outputFileName);
         
         byte[] buffer = new byte[4096];
         int len;
