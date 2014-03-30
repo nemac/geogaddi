@@ -12,11 +12,14 @@ import java.util.logging.Logger;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.nemac.geogaddi.config.PropertiesManager;
+import org.nemac.geogaddi.config.PropertiesManagerFactory;
+import org.nemac.geogaddi.config.PropertyManagerTypeEnum;
 import org.nemac.geogaddi.fetch.Fetcher;
 import org.nemac.geogaddi.integrate.Integrator;
 import org.nemac.geogaddi.parcel.Parceler;
@@ -39,24 +42,31 @@ public class Geogaddi {
         options.addOption("c", false, "Does an clean-write, default");
         options.addOption("u", false, "Work with unzipped files");
         options.addOption("i", false, "Runs only the integrator operation");
+        
         Option propertyArg = new Option("p", true, "Defines the override properties for Geogaddi operations in Java Properties");
         propertyArg.setArgs(1);
+        propertyArg.setOptionalArg(true);
         options.addOption(propertyArg);
+        
         Option jsonArg = new Option("j", true, "Defines the override properties for Geogaddi operations in JSON format");
         jsonArg.setArgs(1);
+        jsonArg.setOptionalArg(true);
         options.addOption(jsonArg);
 
         CommandLineParser parser = new BasicParser();
         try {
             CommandLine cmd = parser.parse(options, args);
 
+            PropertyManagerTypeEnum managerType;
             if (cmd.hasOption("p")) {
-                String propertiesLocation = cmd.getOptionValues("p")[0];
-                props = PropertiesManager.createFromPropertiesFile(propertiesLocation);
+                managerType = PropertyManagerTypeEnum.SIMPLE;
             } else if (cmd.hasOption("j")) {
-                String propertiesLocation = cmd.getOptionValues("j")[0];
-                props = PropertiesManager.createFromJSON(propertiesLocation);
+                managerType = PropertyManagerTypeEnum.JSON;
+            } else {
+                throw new MissingArgumentException("Must specify the properties file type with the \"p\" or \"j\" argument.");
             }
+            
+            props = PropertiesManagerFactory.createPropertyManager(managerType, cmd.getOptionValue(managerType.getArgValue())).build();
 
             boolean all = (props.isOverride() && props.isUseAll()) || cmd.hasOption("a");
             boolean fetch = (props.isOverride() && props.isFetcherEnabled()) || cmd.hasOption("f");
@@ -137,6 +147,8 @@ public class Geogaddi {
         }
 
         long end = System.currentTimeMillis();
+        
+        //TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start);
         System.out.println("Processed in " + (end - start) / 1000f + " seconds");
     }
 }

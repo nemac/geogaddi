@@ -1,5 +1,6 @@
 package org.nemac.geogaddi.integrate;
 
+import com.amazonaws.AmazonClientException;
 import java.io.File;
 
 import com.amazonaws.auth.AWSCredentials;
@@ -10,12 +11,13 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.ObjectMetadataProvider;
 import com.amazonaws.services.s3.transfer.TransferManager;
 
 public class Integrator {
 
-    public static void integrate(AWSCredentials credentials, String sourceDir, String bucketName, boolean clean) {
+    public static void integrate(AWSCredentials credentials, String sourceDir, String bucketName, boolean clean) throws AmazonClientException, InterruptedException {
 
         System.out.println("Transferring content to S3");
 
@@ -39,12 +41,17 @@ public class Integrator {
 
         TransferManager transfer = new TransferManager(s3);
         // TODO: after write GZ to S3, add metadataProvider as last uploadDirectory arg
-        transfer.uploadDirectory(bucketName, null, new File(sourceDir), true).addProgressListener(new ProgressListener() {
+        MultipleFileUpload upload  = transfer.uploadDirectory(bucketName, null, new File(sourceDir), true);
+        upload.addProgressListener(new ProgressListener() {
             @Override
             public void progressChanged(ProgressEvent progressEvent) {
                 System.out.println("... transferred bytes: " + progressEvent.getBytesTransferred());
             }
         });
+        
+        upload.waitForCompletion();
+        
+        transfer.shutdownNow();
 
         System.out.println("... content transferred to S3");
     }

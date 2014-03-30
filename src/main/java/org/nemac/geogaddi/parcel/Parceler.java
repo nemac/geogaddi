@@ -17,7 +17,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-public class Parceler {
+public final class Parceler {
+    
+    private Parceler() {
+        
+    }
 
     public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String whiteListSource, int whiteListIdx, int folderIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed) throws IOException {
         Set<String> whiteList = buildWhitelist(whiteListSource);
