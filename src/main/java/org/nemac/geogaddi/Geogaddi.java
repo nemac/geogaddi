@@ -135,12 +135,10 @@ public class Geogaddi {
 
                 Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite, uncompressParceler);
 
-            	// Implement once figure out integrator blocking, etc
-            	/*
                  if (cleanIntegratorSource) {
-                 FileUtils.deleteDirectory(new File(destDir));
+                     System.out.println("Deleting " + destDir);
+                     FileUtils.deleteDirectory(new File(destDir));
                  }
-                 */
             }
 
         } catch (ParseException | IOException ex) {
@@ -148,8 +146,6 @@ public class Geogaddi {
         }
 
         long end = System.currentTimeMillis();
-        
-        //TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start);
         System.out.println("Processed in " + (end - start) / 1000f + " seconds");
     }
 }

@@ -2,10 +2,8 @@ package org.nemac.geogaddi.config;
 
 public final class PropertiesManagerFactory {
 
-    private final String propertiesSource;
-
-    public PropertiesManagerFactory(String propertiesSource) {
-        this.propertiesSource = propertiesSource;
+    private PropertiesManagerFactory() {
+        //
     }
 
     public static PropertiesManager createPropertyManager(final PropertyManagerTypeEnum managerType, final String propertiesSource) {
