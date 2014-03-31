@@ -30,7 +30,7 @@ public class Geogaddi {
 
     private static PropertiesManager props;
 
-    // command-line util
+    // command-line util 
     public static void main(String args[]) throws InterruptedException {
         long start = System.currentTimeMillis();
 
@@ -66,6 +66,7 @@ public class Geogaddi {
                 throw new MissingArgumentException("Must specify the properties file type with the \"p\" or \"j\" argument.");
             }
             
+            // get PropertiesManager for JSON or Simple types
             props = PropertiesManagerFactory.createPropertyManager(managerType, cmd.getOptionValue(managerType.getArgValue())).build();
 
             boolean all = (props.isOverride() && props.isUseAll()) || cmd.hasOption("a");
