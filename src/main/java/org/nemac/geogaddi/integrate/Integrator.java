@@ -4,8 +4,6 @@ import com.amazonaws.AmazonClientException;
 import java.io.File;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.event.ProgressEvent;
-import com.amazonaws.event.ProgressListener;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
