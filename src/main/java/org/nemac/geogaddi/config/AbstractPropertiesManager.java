@@ -2,7 +2,6 @@ package org.nemac.geogaddi.config;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import java.util.List;
-import java.util.Properties;
 
 public abstract class AbstractPropertiesManager implements PropertiesManager {
     protected boolean override;
