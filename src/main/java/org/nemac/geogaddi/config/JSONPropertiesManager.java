@@ -4,6 +4,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,8 +31,9 @@ public class JSONPropertiesManager extends AbstractPropertiesManager {
         fetcherEnabled = fetcherNode.getBoolean("enabled");
         fetcherUncompress = fetcherNode.getBoolean("uncompress");
         JSONArray fetcherUrlsJSON = fetcherNode.getJSONArray("source");
+        fetcherUrls = new ArrayList<String>();
         for (int i = 0; i < fetcherUrlsJSON.length(); i++) {
-            this.fetcherUrls.add(fetcherUrlsJSON.getString(i));
+            fetcherUrls.add(fetcherUrlsJSON.getString(i));
         }
         fetcherDumpDir = Utils.conformDirectoryString(fetcherNode.getString("dumpDir"));
 
@@ -42,8 +44,9 @@ public class JSONPropertiesManager extends AbstractPropertiesManager {
         parcelerCleanSource = parcelerNode.getBoolean("cleanSource");
         parcelerCleanDestination = parcelerNode.getBoolean("cleanDestination");
         JSONArray sourceCsvs = parcelerNode.getJSONArray("sourceCsv");
+        parcelerSources = new ArrayList<String>();
         for (int i = 0; i < sourceCsvs.length(); i++) {
-            this.parcelerSources.add(sourceCsvs.getString(i));
+            parcelerSources.add(sourceCsvs.getString(i));
         }
         parcelerDestinatonDir = Utils.conformDirectoryString(parcelerNode.getString("outputDir"));
         parcelerFolderWhiteListSource = parcelerNode.getString("folderWhiteList");
