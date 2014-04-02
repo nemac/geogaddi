@@ -40,7 +40,7 @@ public class Integrator {
                 public void provideObjectMetadata(File file, ObjectMetadata metadata) {
                     if (file.getName().contains(".gz")) {
                         metadata.setHeader("content-encoding", "gzip");
-                        metadata.setContentType("application/octet-stream");
+                        metadata.setContentType("text/plain");
                     }
                     
                 }
