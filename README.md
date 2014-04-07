@@ -278,14 +278,6 @@ Even if the bucket contents are public, any machines attempting to access the fi
 See [this link](https://docs.aws.amazon.com/AmazonS3/latest/dev/website-hosting-custom-domain-walkthrough.html) for mapping S3 to a custom domain name.
 
 ## Todo
-### 0.1
-- (RD) Exit program cleanly when using integrator
-
-###0.2
-- (RD) Use GZ end to end
-	- (JH) Then enable S3 GZ content-encoding header in integrator
-- (RD) Add all new JSON properties to Java properties format handler
-
 ###0.3
 - If needed (i.e., if the current architecture becomes costly), add option to get backlog update source from S3 as opposed to relying on the machine hosting the script to maintain a copy of the output
 	- **CURRENT ARCHITECTURE**
