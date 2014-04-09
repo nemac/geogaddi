@@ -59,4 +59,6 @@ public interface PropertiesManager {
 
     boolean isUseAll();
     
+    boolean isQuiet();
+    
 }

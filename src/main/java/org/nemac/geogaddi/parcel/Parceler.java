@@ -23,18 +23,18 @@ public final class Parceler {
         
     }
 
-    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String folderWhiteListSource, int folderWhiteListIdx, int folderIdx, String fileWhiteListSource, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed) throws IOException {
-        Set<String> folderWhiteList = buildWhitelist(folderWhiteListSource);
-        Set<String> fileWhiteList = buildWhitelist(fileWhiteListSource);
-        return hashSourceData(csvSource, folderWhiteList, folderWhiteListIdx, folderIdx, fileWhiteList, fileWhiteListIdx, fileIdx, dataIdxArr, isSourceUncompressed);
+    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String folderWhiteListSource, int folderWhiteListIdx, int folderIdx, String fileWhiteListSource, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed, boolean quiet) throws IOException {
+        Set<String> folderWhiteList = buildWhitelist(folderWhiteListSource, quiet);
+        Set<String> fileWhiteList = buildWhitelist(fileWhiteListSource, quiet);
+        return hashSourceData(csvSource, folderWhiteList, folderWhiteListIdx, folderIdx, fileWhiteList, fileWhiteListIdx, fileIdx, dataIdxArr, isSourceUncompressed, quiet);
     }
 
-    private static Set<String> buildWhitelist(String whiteListSource) throws IOException {
-        System.out.println("Building whitelist ");
+    private static Set<String> buildWhitelist(String whiteListSource, boolean quiet) throws IOException {
+        if (!quiet) System.out.println("Building whitelist ");
         Set<String> whiteList = new HashSet<String>();
 
         if (whiteListSource != null && !whiteListSource.isEmpty()) {
-            System.out.print("from " + whiteListSource);
+            if (!quiet) System.out.print("from " + whiteListSource);
             CSVReader whiteListReader = new CSVReader(new FileReader(whiteListSource));
             String[] nextLine;
             while ((nextLine = whiteListReader.readNext()) != null) {
@@ -43,15 +43,15 @@ public final class Parceler {
 
             whiteListReader.close();
 
-            System.out.println("... whitelist built with " + whiteList.size() + " items");
+            if (!quiet) System.out.println("... whitelist built with " + whiteList.size() + " items");
         } else {
-            System.out.println("... whitelist not found, no filtering will be perfomred");
+            if (!quiet) System.out.println("... whitelist not found, no filtering will be perfomred");
         }
 
         return whiteList;
     }
 
-    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> folderWhiteList, int folderWhiteListIdx, int folderIdx, Set<String> fileWhiteList, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed) throws IOException {
+    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> folderWhiteList, int folderWhiteListIdx, int folderIdx, Set<String> fileWhiteList, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed, boolean quiet) throws IOException {
     	// The data are hashed as follows
         // Map
         // 	String -> Folder
@@ -59,7 +59,7 @@ public final class Parceler {
         //    String -> File
         //    Set   -> Row data
 
-        System.out.println("Hashing " + sourceCSV);
+        if (!quiet) System.out.println("Hashing " + sourceCSV);
         Map<String, Map<String, Set<String>>> folderHash = new TreeMap<String, Map<String, Set<String>>>();
 
         CSVReader dataReader;
@@ -104,7 +104,7 @@ public final class Parceler {
 
         dataReader.close();
 
-        System.out.println("... CSV file hashed");
+        if (!quiet) System.out.println("... CSV file hashed");
         return folderHash;
     }
 

@@ -12,17 +12,17 @@ import org.nemac.geogaddi.write.Utils;
 
 public class Fetcher {
 
-    public static List<String> multiFetch(List<String> sourceUrlPaths, String destinationDirectory, boolean unzip) throws IOException {
+    public static List<String> multiFetch(List<String> sourceUrlPaths, String destinationDirectory, boolean unzip, boolean quiet) throws IOException {
         List<String> outputFiles = new ArrayList<String>();
         for (String sourceUrlPath : sourceUrlPaths) {
-            outputFiles.add(fetch(sourceUrlPath, destinationDirectory, unzip));
+            outputFiles.add(fetch(sourceUrlPath, destinationDirectory, unzip, quiet));
         }
 
         return outputFiles;
     }
 
-    public static String fetch(String sourceUrlPath, String destinationDirectory, boolean unzip) throws IOException {
-        String downloadedFilePath = download(sourceUrlPath, destinationDirectory);
+    public static String fetch(String sourceUrlPath, String destinationDirectory, boolean unzip, boolean quiet) throws IOException {
+        String downloadedFilePath = download(sourceUrlPath, destinationDirectory, quiet);
         if (unzip) {
             return destinationDirectory + Utils.uncompress(downloadedFilePath, destinationDirectory);
         } else {
@@ -30,8 +30,8 @@ public class Fetcher {
         }
     }
 
-    private static String download(String sourceUrlPath, String destinationDirectory) throws IOException {
-        System.out.println(sourceUrlPath + " is downloading to " + destinationDirectory);
+    private static String download(String sourceUrlPath, String destinationDirectory, boolean quiet) throws IOException {
+        if (!quiet) System.out.println(sourceUrlPath + " is downloading to " + destinationDirectory);
         URL url = new URL(sourceUrlPath);
         URLConnection downloader = url.openConnection(); // new FtpURLConnection(url);
         InputStream inputStream = downloader.getInputStream();
@@ -52,7 +52,7 @@ public class Fetcher {
         inputStream.close();
         outputStream.close();
 
-        System.out.println("... download complete");
+        if (!quiet) System.out.println("... download complete");
         return outputFilePath;
     }
 }

@@ -22,6 +22,7 @@ public class SimplePropertiesManager extends AbstractPropertiesManager {
 
         //override
         override = Boolean.parseBoolean(props.getProperty("override"));
+        quiet = Boolean.parseBoolean(props.getProperty("quiet"));
         useAll = Boolean.parseBoolean(props.getProperty("useall"));
         
         // fetcher

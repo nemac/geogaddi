@@ -31,7 +31,7 @@ import com.amazonaws.services.s3.model.VersionListing;
  */
 public class BucketDestroy {
 
-    public static void emptyBucket(final AmazonS3 s3, final String bucketName) {
+    public static void emptyBucket(final AmazonS3 s3, final String bucketName, boolean quiet) {
         // Set up a new thread pool to delete 20 objects at a time.
         ExecutorService _pool = Executors.newFixedThreadPool(20);
 
@@ -75,6 +75,6 @@ public class BucketDestroy {
 
         _pool.shutdown();
 
-        System.out.println("... bucket " + bucketName + " emptied");
+        if (!quiet) System.out.println("... bucket " + bucketName + " emptied");
     }
 }

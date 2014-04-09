@@ -1,5 +1,6 @@
 {
 	"override": true,
+	"quiet": true,
 	"useAll": false,
 	"fetcher": {
 		"enabled": true,

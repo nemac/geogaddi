@@ -79,15 +79,20 @@ public class Geogaddi {
             boolean cleanFetcherSource = props.isParcelerCleanSource();
             boolean cleanDestinationBeforeWrite = (props.isOverride() && props.isParcelerCleanDestination()) || (!props.isOverride() && cmd.hasOption("c"));
 
-            // TODO: implement these
             boolean uncompressParceler = (props.isOverride() && props.isParcelerUncompress()) || (!props.isOverride() && cmd.hasOption("u"));
-            boolean existingSourcesFromIntegrator = props.isOverride() && props.isParcelerExistingFromIntegrator();
+
             boolean cleanIntegratorSource = props.isIntegratorCleanSource();
+
+            boolean quiet = props.isQuiet();
+            
+            // TODO: implement these
+            boolean existingSourcesFromIntegrator = props.isOverride() && props.isParcelerExistingFromIntegrator();
+
 
             List<String> csvSources = new ArrayList<String>();
 
             if (all || fetch) {
-                csvSources = Fetcher.multiFetch(props.getFetchUrls(), props.getDumpDir(), uncompressFetcher);
+                csvSources = Fetcher.multiFetch(props.getFetchUrls(), props.getDumpDir(), uncompressFetcher, quiet);
             }
 
             if (all || transform) {
@@ -100,9 +105,9 @@ public class Geogaddi {
                     File destDir = new File(props.getDestinatonDir());
 
                     if (cleanDestinationBeforeWrite && destDir.exists()) {
-                        System.out.println("Cleaning directory " + props.getDestinatonDir());
+                        if (!quiet) System.out.println("Cleaning directory " + props.getDestinatonDir());
                         FileUtils.cleanDirectory(destDir);
-                        System.out.println("... directory cleaned");
+                        if (!quiet) System.out.println("... directory cleaned");
                     }
                 }
 
@@ -112,9 +117,9 @@ public class Geogaddi {
                     Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource,
                             props.getDestinatonDir(), props.getFolderWhiteListSource(), props.getFolderWhiteListIdx(),
                             props.getFolderIdx(), props.getFileWhiteListSource(), props.getFileWhiteListIdx(), props.getFileIdx(), 
-                            props.getDataIdxArr(), uncompressFetcher);
+                            props.getDataIdxArr(), uncompressFetcher, quiet);
 
-                    Writer.write(parcelMap, props.getDestinatonDir(), uncompressParceler, summarizer);
+                    Writer.write(parcelMap, props.getDestinatonDir(), uncompressParceler, summarizer, quiet);
 
                     // clean up downloaded file
                     if (cleanFetcherSource) {
@@ -134,10 +139,10 @@ public class Geogaddi {
                     destDir = props.getDestinatonDir();
                 }
 
-                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite, uncompressParceler);
+                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite, uncompressParceler, quiet);
 
                  if (cleanIntegratorSource) {
-                     System.out.println("Deleting " + destDir);
+                     if (!quiet) System.out.println("Deleting " + destDir);
                      FileUtils.deleteDirectory(new File(destDir));
                  }
             }

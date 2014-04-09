@@ -24,6 +24,7 @@ public class JSONPropertiesManager extends AbstractPropertiesManager {
         
         //override
         override = rootNode.getBoolean("override");
+        quiet = rootNode.getBoolean("quiet");
         useAll = rootNode.getBoolean("useAll");
 
         // fetcher

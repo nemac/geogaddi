@@ -5,6 +5,7 @@ import java.util.List;
 
 public abstract class AbstractPropertiesManager implements PropertiesManager {
     protected boolean override;
+    protected boolean quiet;
     protected boolean useAll;
     protected boolean fetcherEnabled;
     protected boolean fetcherUncompress;
@@ -34,6 +35,11 @@ public abstract class AbstractPropertiesManager implements PropertiesManager {
     @Override
     public boolean isOverride() {
         return override;
+    }
+    
+    @Override
+    public boolean isQuiet() {
+        return quiet;
     }
 
     @Override

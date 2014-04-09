@@ -15,8 +15,8 @@ import com.amazonaws.services.s3.transfer.TransferManager;
 
 public class Integrator {
     
-    public static void integrate(AWSCredentials credentials, String sourceDir, String bucketName, boolean clean, boolean uncompressed) throws AmazonClientException, InterruptedException  {
-        System.out.println("Transferring content to S3");
+    public static void integrate(AWSCredentials credentials, String sourceDir, String bucketName, boolean clean, boolean uncompressed, boolean quiet) throws AmazonClientException, InterruptedException  {
+        if (!quiet) System.out.println("Transferring content to S3");
 
         AmazonS3 s3 = new AmazonS3Client(credentials);
         s3.setRegion(Region.getRegion(Regions.US_EAST_1)); // TODO: parameterize?
@@ -26,7 +26,7 @@ public class Integrator {
         }
 
         if (clean) {
-            BucketDestroy.emptyBucket(s3, bucketName);
+            BucketDestroy.emptyBucket(s3, bucketName, quiet);
         }
 
         TransferManager transfer = new TransferManager(s3);
@@ -49,12 +49,12 @@ public class Integrator {
             upload = transfer.uploadDirectory(bucketName, null, new File(sourceDir), true, metadataProvider);
         }
         
-        upload.addProgressListener(new IntegratorProgressListener());
+        if (!quiet) upload.addProgressListener(new IntegratorProgressListener());
         
         upload.waitForCompletion();
         
         transfer.shutdownNow();
 
-        System.out.println("... content transferred to S3");
+        if (!quiet) System.out.println("... content transferred to S3");
     }
 }

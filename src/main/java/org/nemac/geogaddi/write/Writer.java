@@ -17,9 +17,9 @@ public class Writer {
     private static final String compressedOutputPattern = "%s/%s/%s.csv.gz";
 
     // TODO: use uncompress flag to optionally work with gzipped files
-    public static void write(Map<String, Map<String, Set<String>>> parcelMap, String destDirPath, boolean uncompressed, Summarizer summarizer) throws IOException {
+    public static void write(Map<String, Map<String, Set<String>>> parcelMap, String destDirPath, boolean uncompressed, Summarizer summarizer, boolean quiet) throws IOException {
         boolean compressed = !uncompressed;
-        System.out.println("Writing to " + destDirPath);
+        if (!quiet) System.out.println("Writing to " + destDirPath);
 
         for (Map.Entry<String, Map<String, Set<String>>> folderEntry : parcelMap.entrySet()) {
             Map<String, Set<String>> fileHash = folderEntry.getValue();
@@ -48,14 +48,14 @@ public class Writer {
                                         
                     // check last element of source list to see if it should come before new item hash
                     if (!sourceList.isEmpty() && !hashedList.isEmpty() && sourceList.get(sourceList.size() - 1).compareTo(hashedList.get(0)) > 0) {
-                        System.out.println("... backlog data detected, rebuilding output");
+                        if (!quiet) System.out.println("... backlog data detected, rebuilding output");
                         Set<String> writeSet = new TreeSet<String>();
                         writeSet.addAll(sourceList);
                         writeSet.addAll(hashedList);
                         FileUtils.writeLines(useFile, writeSet);
                     } else {
                         if (hashedList.isEmpty()) {
-                            System.out.println("... skipping " + destFile + " - all entries are duplicates");
+                            if (!quiet) System.out.println("... skipping " + destFile + " - all entries are duplicates");
                         } else {
                             //System.out.print("... appending new lines to the end");
                             FileUtils.writeLines(useFile, hashedList, true);
@@ -72,6 +72,6 @@ public class Writer {
             }
         }
 
-        System.out.println("... data written to the CSVs");
+        if (!quiet) System.out.println("... data written to the CSVs");
     }
 }
