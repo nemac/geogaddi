@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.nemac.geogaddi.config.element.TransformationProperty;
 import org.nemac.geogaddi.write.Utils;
 
 public class JSONPropertiesManager extends AbstractPropertiesManager {
@@ -22,15 +23,13 @@ public class JSONPropertiesManager extends AbstractPropertiesManager {
         String input = FileUtils.readFileToString(new File(propertiesSource));
         JSONObject rootNode = new JSONObject(input);
         
-        //override
-        override = rootNode.getBoolean("override");
         quiet = rootNode.getBoolean("quiet");
         useAll = rootNode.getBoolean("useAll");
+        uncompress = rootNode.getBoolean("uncompress");
 
         // fetcher
         JSONObject fetcherNode = rootNode.getJSONObject("fetcher");
         fetcherEnabled = fetcherNode.getBoolean("enabled");
-        fetcherUncompress = fetcherNode.getBoolean("uncompress");
         JSONArray fetcherUrlsJSON = fetcherNode.getJSONArray("source");
         fetcherUrls = new ArrayList<String>();
         for (int i = 0; i < fetcherUrlsJSON.length(); i++) {
@@ -41,7 +40,6 @@ public class JSONPropertiesManager extends AbstractPropertiesManager {
         // parceler
         JSONObject parcelerNode = rootNode.getJSONObject("parceler");
         parcelerEnabled = parcelerNode.getBoolean("enabled");
-        parcelerUncompress = parcelerNode.getBoolean("uncompress");
         parcelerCleanSource = parcelerNode.getBoolean("cleanSource");
         parcelerCleanDestination = parcelerNode.getBoolean("cleanDestination");
         JSONArray sourceCsvs = parcelerNode.getJSONArray("sourceCsv");
@@ -73,6 +71,29 @@ public class JSONPropertiesManager extends AbstractPropertiesManager {
         integratorSourceDir = Utils.conformDirectoryString(integratorNode.getString("sourceDir"));
         integratorCredentials = new BasicAWSCredentials(integratorNode.getString("awsAccessKeyId"), integratorNode.getString("awsSecretKey"));
         integratorBucketName = integratorNode.getString("bucketName");
+        
+        // deriver
+        JSONObject deriverNode = rootNode.getJSONObject("deriver");
+        deriverEnabled = deriverNode.getBoolean("enabled");
+        deriverSourceDir = deriverNode.getString("sourceDir");
+        
+        transformations = new ArrayList<>();
+        JSONArray trans = deriverNode.getJSONArray("transformations");
+        
+        for (int i = 0; i < trans.length(); i++) {
+            JSONObject ob = trans.getJSONObject(i);
+            TransformationProperty p = new TransformationProperty(
+                ob.getString("name"), 
+                ob.getString("transformationSourceLib"),
+                ob.getString("transformation"),
+                ob.getString("folder"),
+                ob.getString("file"),
+                ob.getString("normalDir"),
+                ob.getInt("dateIndex"),
+                ob.getInt("valueIndex"),
+                ob.getString("outName"));
+            transformations.add(p);
+        }
 
         return this;
     }

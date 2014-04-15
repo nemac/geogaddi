@@ -20,21 +20,18 @@ public class SimplePropertiesManager extends AbstractPropertiesManager {
         Properties props = new Properties();
         props.load(reader);
 
-        //override
-        override = Boolean.parseBoolean(props.getProperty("override"));
         quiet = Boolean.parseBoolean(props.getProperty("quiet"));
         useAll = Boolean.parseBoolean(props.getProperty("useall"));
+        uncompress = Boolean.parseBoolean(props.getProperty("uncompress"));
         
         // fetcher
         fetcherEnabled = Boolean.parseBoolean(props.getProperty("fetcher.enabled"));
-        fetcherUncompress = Boolean.parseBoolean(props.getProperty("fetcher.uncompress"));
         String fetchUrlPathProperty = props.getProperty("fetcher.source.url");
         fetcherUrls = Arrays.asList(fetchUrlPathProperty.replace(" ", "").split(","));
         fetcherDumpDir = props.getProperty("fetcher.dump.dir");
 
         // parceler
         parcelerEnabled = Boolean.parseBoolean(props.getProperty("parceler.enabled"));
-        parcelerUncompress = Boolean.parseBoolean(props.getProperty("parceler.uncompress"));
         parcelerCleanSource = Boolean.parseBoolean(props.getProperty("parceler.clean.source"));
         parcelerCleanDestination = Boolean.parseBoolean(props.getProperty("parceler.clean.destination"));
         String sourceCSVProperty = props.getProperty("parceler.source.csv");

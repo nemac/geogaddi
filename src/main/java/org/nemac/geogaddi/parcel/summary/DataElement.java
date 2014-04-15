@@ -1,13 +1,15 @@
 package org.nemac.geogaddi.parcel.summary;
 
-public class DataRange {
+public class DataElement {
     
     private String min;
     private String max;
+    private int state;
     
-    public DataRange(String min, String max) {
+    public DataElement(String min, String max, int state) {
         this.min = min;
         this.max = max;
+        this.state = state;
     }
 
     public String getMin() {
@@ -24,5 +26,13 @@ public class DataRange {
 
     public void setMax(String max) {
         this.max = max;
+    }
+    
+    public int getState() {
+        return state;
+    }
+    
+    public void setState(int state) {
+        this.state = state;
     }
 }

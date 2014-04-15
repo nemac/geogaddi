@@ -4,10 +4,17 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import org.nemac.geogaddi.config.element.TransformationProperty;
 
 public interface PropertiesManager {
     
     PropertiesManager build() throws FileNotFoundException, IOException;
+    
+    List<TransformationProperty> getTransformations();
+    
+    String getDeriverSourceDir();
+    
+    boolean isDeriverEnabled();
 
     String getBucketName();
 
@@ -39,13 +46,9 @@ public interface PropertiesManager {
 
     boolean isFetcherEnabled();
 
-    boolean isFetcherUncompress();
-
     boolean isIntegratorCleanSource();
 
     boolean isIntegratorEnabled();
-
-    boolean isOverride();
 
     boolean isParcelerCleanDestination();
 
@@ -54,8 +57,8 @@ public interface PropertiesManager {
     boolean isParcelerEnabled();
 
     boolean isParcelerExistingFromIntegrator();
-
-    boolean isParcelerUncompress();
+    
+    boolean isUncompress();
 
     boolean isUseAll();
     

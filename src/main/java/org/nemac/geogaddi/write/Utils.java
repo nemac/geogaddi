@@ -35,7 +35,7 @@ public class Utils {
         return outputFileName;
     }
     
-    public static String uncompress(String sourceFileName) throws IOException {
+    public static String uncompress(String sourceFileName, boolean cleanup) throws IOException {
         int suffixDelimiterPosition = sourceFileName.lastIndexOf(COMPRESSION_EXTENSION);
         String outputFileName = sourceFileName.substring(0, suffixDelimiterPosition);
 
@@ -53,7 +53,9 @@ public class Utils {
         outputFile.close();
 
         // cleanup source zip
-        FileUtils.forceDelete(sourceFile);
+        if (cleanup) {
+            FileUtils.forceDelete(sourceFile);
+        }
 
         return outputFileName;
     }

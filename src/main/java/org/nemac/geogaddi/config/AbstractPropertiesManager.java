@@ -2,17 +2,16 @@ package org.nemac.geogaddi.config;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import java.util.List;
+import org.nemac.geogaddi.config.element.TransformationProperty;
 
 public abstract class AbstractPropertiesManager implements PropertiesManager {
-    protected boolean override;
     protected boolean quiet;
     protected boolean useAll;
+    protected boolean uncompress;
     protected boolean fetcherEnabled;
-    protected boolean fetcherUncompress;
     protected List<String> fetcherUrls;
     protected String fetcherDumpDir;
     protected boolean parcelerEnabled;
-    protected boolean parcelerUncompress;
     protected boolean parcelerCleanSource;
     protected boolean parcelerCleanDestination;
     protected boolean parcelerExistingFromIntegrator;
@@ -31,11 +30,9 @@ public abstract class AbstractPropertiesManager implements PropertiesManager {
     protected BasicAWSCredentials integratorCredentials;
     protected String integratorBucketName;
     protected String propertiesSource;
-
-    @Override
-    public boolean isOverride() {
-        return override;
-    }
+    protected boolean deriverEnabled;
+    protected String deriverSourceDir;
+    protected List<TransformationProperty> transformations;
     
     @Override
     public boolean isQuiet() {
@@ -46,15 +43,15 @@ public abstract class AbstractPropertiesManager implements PropertiesManager {
     public boolean isUseAll() {
         return useAll;
     }
+    
+    @Override
+    public boolean isUncompress() {
+        return uncompress;
+    }
 
     @Override
     public boolean isFetcherEnabled() {
         return fetcherEnabled;
-    }
-
-    @Override
-    public boolean isFetcherUncompress() {
-        return fetcherUncompress;
     }
 
     @Override
@@ -70,11 +67,6 @@ public abstract class AbstractPropertiesManager implements PropertiesManager {
     @Override
     public boolean isParcelerEnabled() {
         return parcelerEnabled;
-    }
-
-    @Override
-    public boolean isParcelerUncompress() {
-        return parcelerUncompress;
     }
 
     @Override
@@ -160,5 +152,20 @@ public abstract class AbstractPropertiesManager implements PropertiesManager {
     @Override
     public String getBucketName() {
         return integratorBucketName;
+    }
+    
+    @Override
+    public boolean isDeriverEnabled() {
+        return deriverEnabled;
+    }
+    
+    @Override
+    public String getDeriverSourceDir() {
+        return deriverSourceDir;
+    }
+    
+    @Override
+    public List<TransformationProperty> getTransformations() {
+        return transformations;
     }
 }

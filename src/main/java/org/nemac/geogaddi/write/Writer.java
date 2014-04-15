@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.nemac.geogaddi.parcel.summary.Summarizer;
+import org.nemac.geogaddi.parcel.summary.SummaryState;
 
 public class Writer {
 
@@ -32,13 +33,10 @@ public class Writer {
                 if (compressed) { // need to uncompress to read
                     File compressedFile = new File(String.format(compressedOutputPattern, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
                     if (compressedFile.exists()) {
-                        useFile = new File(Utils.uncompress(compressedFile.getCanonicalPath()));
+                        useFile = new File(Utils.uncompress(compressedFile.getCanonicalPath(), true));
                     }
                 }
                 
-                // insert to summary
-                summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), fileEntry.getValue());
-
                 if (destFile.exists()) {
                     // scan and compare duplicate lines between the file and the hash
                     List<String> sourceList = FileUtils.readLines(useFile);
@@ -53,12 +51,14 @@ public class Writer {
                         writeSet.addAll(sourceList);
                         writeSet.addAll(hashedList);
                         FileUtils.writeLines(useFile, writeSet);
+                        summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), writeSet, SummaryState.BACKLOG);
                     } else {
                         if (hashedList.isEmpty()) {
                             if (!quiet) System.out.println("... skipping " + destFile + " - all entries are duplicates");
+                            summarizer.setElement(folderEntry.getKey(), fileEntry.getKey(), Summarizer.getDataRange(sourceList, SummaryState.UNCHANGED));
                         } else {
-                            //System.out.print("... appending new lines to the end");
                             FileUtils.writeLines(useFile, hashedList, true);
+                            summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), sourceList.get(0).split(",")[0], hashedList.get(hashedList.size() - 1).split(",")[0], SummaryState.APPEND);
                         }
                     }
                 } else {

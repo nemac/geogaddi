@@ -20,6 +20,8 @@ import org.apache.commons.io.FileUtils;
 import org.nemac.geogaddi.config.PropertiesManager;
 import org.nemac.geogaddi.config.PropertiesManagerFactory;
 import org.nemac.geogaddi.config.PropertyManagerTypeEnum;
+import org.nemac.geogaddi.config.element.TransformationProperty;
+import org.nemac.geogaddi.derive.Deriver;
 import org.nemac.geogaddi.fetch.Fetcher;
 import org.nemac.geogaddi.integrate.Integrator;
 import org.nemac.geogaddi.parcel.Parceler;
@@ -31,17 +33,11 @@ public class Geogaddi {
     private static PropertiesManager props;
 
     // command-line util 
-    public static void main(String args[]) throws InterruptedException {
+    public static void main(String args[]) throws InterruptedException, java.text.ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         long start = System.currentTimeMillis();
 
         // command-line args
         Options options = new Options();
-        options.addOption("a", false, "Runs the fetch, transform, and integrator operations");
-        options.addOption("f", false, "Runs only the fetch operation");
-        options.addOption("t", false, "Runs only the transform operation");
-        options.addOption("c", false, "Does an clean-write, default");
-        options.addOption("u", false, "Work with unzipped files");
-        options.addOption("i", false, "Runs only the integrator operation");
         
         Option propertyArg = new Option("p", true, "Defines the override properties for Geogaddi operations in Java Properties");
         propertyArg.setArgs(1);
@@ -69,33 +65,35 @@ public class Geogaddi {
             // get PropertiesManager for JSON or Simple types
             props = PropertiesManagerFactory.createPropertyManager(managerType, cmd.getOptionValue(managerType.getArgValue())).build();
 
-            boolean all = (props.isOverride() && props.isUseAll()) || cmd.hasOption("a");
-            boolean fetch = (props.isOverride() && props.isFetcherEnabled()) || cmd.hasOption("f");
-            boolean transform = (props.isOverride() && props.isParcelerEnabled()) || cmd.hasOption("t");
-            boolean integrate = (props.isOverride() && props.isIntegratorEnabled()) || cmd.hasOption("i");
+            boolean all = props.isUseAll();
+            boolean fetch = props.isFetcherEnabled();
+            boolean parcel = props.isParcelerEnabled();
+            boolean integrate = props.isIntegratorEnabled();
+            boolean derive = props.isDeriverEnabled() && cmd.hasOption("j"); // currently only implemented for JSON-based properties
+            
+            boolean uncompress = props.isUncompress();
 
             // fetcher
-            boolean uncompressFetcher = (props.isOverride() && props.isFetcherUncompress()) || (!props.isOverride() && cmd.hasOption("u"));
             boolean cleanFetcherSource = props.isParcelerCleanSource();
-            boolean cleanDestinationBeforeWrite = (props.isOverride() && props.isParcelerCleanDestination()) || (!props.isOverride() && cmd.hasOption("c"));
-
-            boolean uncompressParceler = (props.isOverride() && props.isParcelerUncompress()) || (!props.isOverride() && cmd.hasOption("u"));
+            boolean cleanDestinationBeforeWrite = props.isParcelerCleanDestination();
 
             boolean cleanIntegratorSource = props.isIntegratorCleanSource();
 
             boolean quiet = props.isQuiet();
             
             // TODO: implement these
-            boolean existingSourcesFromIntegrator = props.isOverride() && props.isParcelerExistingFromIntegrator();
-
+            boolean existingSourcesFromIntegrator = props.isParcelerExistingFromIntegrator();
 
             List<String> csvSources = new ArrayList<String>();
+            
+            // TODO: make summarizer more sophisticated so as not to clobber the summary on using deriver only
+            Summarizer summarizer = new Summarizer();
 
             if (all || fetch) {
-                csvSources = Fetcher.multiFetch(props.getFetchUrls(), props.getDumpDir(), uncompressFetcher, quiet);
+                csvSources = Fetcher.multiFetch(props.getFetchUrls(), props.getDumpDir(), uncompress, quiet);
             }
 
-            if (all || transform) {
+            if (all || parcel) {
                 // check if there is output from the previous step
                 if (csvSources.isEmpty()) {
                     csvSources = props.getParcelerSources();
@@ -110,43 +108,51 @@ public class Geogaddi {
                         if (!quiet) System.out.println("... directory cleaned");
                     }
                 }
-
-                Summarizer summarizer = new Summarizer();
                 
                 for (String csvSource : csvSources) {
                     Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource,
                             props.getDestinatonDir(), props.getFolderWhiteListSource(), props.getFolderWhiteListIdx(),
                             props.getFolderIdx(), props.getFileWhiteListSource(), props.getFileWhiteListIdx(), props.getFileIdx(), 
-                            props.getDataIdxArr(), uncompressFetcher, quiet);
+                            props.getDataIdxArr(), uncompress, quiet);
 
-                    Writer.write(parcelMap, props.getDestinatonDir(), uncompressParceler, summarizer, quiet);
+                    Writer.write(parcelMap, props.getDestinatonDir(), uncompress, summarizer, quiet);
 
                     // clean up downloaded file
                     if (cleanFetcherSource) {
                         FileUtils.deleteQuietly(new File(csvSource));
                     }
                 }
-                
+            }
+            
+            if ((all && cmd.hasOption("j")) || derive) {
+                for (TransformationProperty transformation : props.getTransformations()) {
+                    Map<String, Map<String, Set<String>>> derived = Deriver.derive(props.getDeriverSourceDir(), transformation, uncompress);
+                    Writer.write(derived, props.getDestinatonDir(), uncompress, summarizer, quiet);
+                }
+            }
+
+            if (all || parcel || derive) {
                 // write out summary
                 FileUtils.writeStringToFile(new File(props.getDestinatonDir() + "/summary.json"), summarizer.jsonSummary());
             }
-
+            
             if (all || integrate) {
                 String destDir;
-                if (!all && !transform) {
+                if (!all && !parcel) {
                     destDir = props.getIntegratorSourceDir();
                 } else {
                     destDir = props.getDestinatonDir();
                 }
 
-                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite, uncompressParceler, quiet);
+                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite, uncompress, quiet);
 
                  if (cleanIntegratorSource) {
                      if (!quiet) System.out.println("Deleting " + destDir);
                      FileUtils.deleteDirectory(new File(destDir));
                  }
             }
-
+            
+            
         } catch (ParseException | IOException ex) {
             Logger.getLogger(Geogaddi.class.getName()).log(Level.SEVERE, null, ex);
         }
