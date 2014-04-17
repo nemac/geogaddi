@@ -1,15 +1,15 @@
 {
-    "quiet": true,
-    "useAll": false,
-    "uncompress": false,
-    "fetcher": {
-        "enabled": false,
-        "uncompress": false,
-        "source": [
+    "quiet": false,
+    "useAll": true,
+    "uncompress": true,
+    "fetcherOptions": {
+        "enabled": true,
+        "uncompress": true,
+        "sources": [
             "ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1900.csv.gz",
             "ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1901.csv.gz"
         ],
-        "dumpDir": "data/dump"
+        "dumpDir": "test/data/dump"
     },
     "parceler": {
         "enabled": false,
@@ -38,17 +38,17 @@
         "awsSecretKey": "",
         "bucketName": ""
     },
-    "deriver": {
-        "enabled": true,
-        "sourceDir": "data/output",
+    "deriverOptions": {
+        "enabled": false,
+        "sourceDir": "test/data/output",
         "transformations": [
             {
                 "name": "First Transformation",
-                "transformationSourceLib": "",
+                "transformationSourceLib": "testSourceLib",
                 "transformation": "YTDCumulative",
-                "folder": "",
+                "folder": "testTransformationFolder",
                 "file": "PRCP",
-                "normalDir": "",
+                "normalDir": "testNormalDir",
                 "dateIndex": 0,
                 "dataIndex": 1,
                 "outName": "PRCP_YTD"

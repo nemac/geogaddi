@@ -32,7 +32,7 @@ public class Geogaddi {
 
     private static PropertiesManager props;
 
-    // command-line util 
+    // command-line util
     public static void main(String args[]) throws InterruptedException, java.text.ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         long start = System.currentTimeMillis();
 
@@ -63,7 +63,8 @@ public class Geogaddi {
             }
             
             // get PropertiesManager for JSON or Simple types
-            props = PropertiesManagerFactory.createPropertyManager(managerType, cmd.getOptionValue(managerType.getArgValue())).build();
+            String propertiesSource = cmd.getOptionValue(managerType.getArgValue());
+            props = PropertiesManagerFactory.createPropertyManager(managerType, propertiesSource).build();
 
             boolean all = props.isUseAll();
             boolean fetch = props.isFetcherEnabled();

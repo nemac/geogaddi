@@ -13,7 +13,7 @@ import org.nemac.geogaddi.write.Utils;
 
 public class JSONPropertiesManager extends AbstractPropertiesManager {
     private static final String DEFAULT_PROPERTIES_PATH = "geogaddi.json";
-    
+
     JSONPropertiesManager(final String propertiesSource) {
         this.propertiesSource = propertiesSource == null ? DEFAULT_PROPERTIES_PATH : propertiesSource;
     }
@@ -22,7 +22,7 @@ public class JSONPropertiesManager extends AbstractPropertiesManager {
     public PropertiesManager build() throws FileNotFoundException, IOException {
         String input = FileUtils.readFileToString(new File(propertiesSource));
         JSONObject rootNode = new JSONObject(input);
-        
+
         quiet = rootNode.getBoolean("quiet");
         useAll = rootNode.getBoolean("useAll");
         uncompress = rootNode.getBoolean("uncompress");
@@ -71,19 +71,19 @@ public class JSONPropertiesManager extends AbstractPropertiesManager {
         integratorSourceDir = Utils.conformDirectoryString(integratorNode.getString("sourceDir"));
         integratorCredentials = new BasicAWSCredentials(integratorNode.getString("awsAccessKeyId"), integratorNode.getString("awsSecretKey"));
         integratorBucketName = integratorNode.getString("bucketName");
-        
+
         // deriver
         JSONObject deriverNode = rootNode.getJSONObject("deriver");
         deriverEnabled = deriverNode.getBoolean("enabled");
         deriverSourceDir = deriverNode.getString("sourceDir");
-        
+
         transformations = new ArrayList<>();
         JSONArray trans = deriverNode.getJSONArray("transformations");
-        
+
         for (int i = 0; i < trans.length(); i++) {
             JSONObject ob = trans.getJSONObject(i);
             TransformationProperty p = new TransformationProperty(
-                ob.getString("name"), 
+                ob.getString("name"),
                 ob.getString("transformationSourceLib"),
                 ob.getString("transformation"),
                 ob.getString("folder"),
