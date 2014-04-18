@@ -1,6 +1,6 @@
-package org.nemac.geogaddi.config.element;
+package org.nemac.geogaddi.model;
 
-public class TransformationProperty {
+public class TransformationOptions {
     
     private final String name;
     private final String transformationSourceLib;
@@ -12,7 +12,7 @@ public class TransformationProperty {
     private final int dataIndex;
     private final String outName;
 
-    public TransformationProperty(String name, String transformationSourceLib, String transformation, String folder, String file, String normalSource, int dateIndex, int dataIndex, String outName) {
+    public TransformationOptions(String name, String transformationSourceLib, String transformation, String folder, String file, String normalSource, int dateIndex, int dataIndex, String outName) {
         this.name = name;
         this.transformationSourceLib = transformationSourceLib;
         this.transformation = transformation;

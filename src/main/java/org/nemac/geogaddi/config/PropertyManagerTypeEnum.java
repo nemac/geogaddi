@@ -1,7 +1,7 @@
 package org.nemac.geogaddi.config;
 
 public enum PropertyManagerTypeEnum {
-    SIMPLE("p"), JSON("j");
+    JAVA_PROPS("p"), JSON_PROPS("j");
 
     private final String arg;
 

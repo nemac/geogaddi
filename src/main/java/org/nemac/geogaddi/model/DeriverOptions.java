@@ -1,11 +1,11 @@
-package org.nemac.geogaddi.config.element;
+package org.nemac.geogaddi.model;
 
 import java.util.List;
 
 public class DeriverOptions {
     private boolean enabled = true;
     private String sourceDir = "data/output";
-    private List<TransformationProperty> transformations;
+    private List<TransformationOptions> transformations;
 
     public boolean isEnabled() {
         return enabled;
@@ -23,11 +23,11 @@ public class DeriverOptions {
         this.sourceDir = sourceDir;
     }
 
-    public List<TransformationProperty> getTransformations() {
+    public List<TransformationOptions> getTransformations() {
         return transformations;
     }
 
-    public void setTransformations(List<TransformationProperty> transformations) {
+    public void setTransformations(List<TransformationOptions> transformations) {
         this.transformations = transformations;
     }
 }

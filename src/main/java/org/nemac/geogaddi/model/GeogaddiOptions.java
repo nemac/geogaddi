@@ -1,4 +1,4 @@
-package org.nemac.geogaddi.config.element;
+package org.nemac.geogaddi.model;
 
 public class GeogaddiOptions {
     private DeriverOptions deriverOptions;
@@ -6,7 +6,7 @@ public class GeogaddiOptions {
     private GeogaddiOptions geogaddiOptions;
     private IntegratorOptions integratorOptions;
     private ParcelerOptions parcelerOptions;
-    private TransformationProperty transformationProperty;
+    private TransformationOptions transformationOptions;
     private boolean quiet = true;
     private boolean useAll = false;
     private boolean uncompress = false;
@@ -51,12 +51,12 @@ public class GeogaddiOptions {
         this.parcelerOptions = parcelerOptions;
     }
 
-    public TransformationProperty getTransformationProperty() {
-        return transformationProperty;
+    public TransformationOptions getTransformationOptions() {
+        return transformationOptions;
     }
 
-    public void setTransformationProperty(TransformationProperty transformationProperty) {
-        this.transformationProperty = transformationProperty;
+    public void setTransformationOptions(TransformationOptions transformationOptions) {
+        this.transformationOptions = transformationOptions;
     }
 
     public boolean isQuiet() {

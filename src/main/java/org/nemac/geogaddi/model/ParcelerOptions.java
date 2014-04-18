@@ -1,4 +1,4 @@
-package org.nemac.geogaddi.config.element;
+package org.nemac.geogaddi.model;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,13 +9,13 @@ public class ParcelerOptions {
     private boolean cleanSource = false;
     private boolean cleanDestination = true;
     private boolean existingFromIntegrator = true;
-    private String whitelistFileSource;
-    private int whitelistFileIndex = 2;
+//    private String whitelistFileSource;
     private List<String> sourceCSVs;
     private String folderWhiteList = "";
     private int folderWhiteListIndex = 0;
     private int folderIndex = 0;
     private String fileWhiteList;
+    private int fileWhiteListIndex = 2;
     private int fileIndex = 2;
     private List<Integer> dataIndexes = Arrays.asList(1, 3);
     private String outputDir = "data/output";
@@ -60,22 +60,6 @@ public class ParcelerOptions {
         this.existingFromIntegrator = existingFromIntegrator;
     }
 
-    public String getWhitelistFileSource() {
-        return whitelistFileSource;
-    }
-
-    public void setWhitelistFileSource(String whitelistFileSource) {
-        this.whitelistFileSource = whitelistFileSource;
-    }
-
-    public int getWhitelistFileIndex() {
-        return whitelistFileIndex;
-    }
-
-    public void setWhitelistFileIndex(int whitelistFileIndex) {
-        this.whitelistFileIndex = whitelistFileIndex;
-    }
-
     public List<String> getSourceCSVs() {
         return sourceCSVs;
     }
@@ -114,6 +98,14 @@ public class ParcelerOptions {
 
     public void setFileWhiteList(String fileWhiteList) {
         this.fileWhiteList = fileWhiteList;
+    }
+
+    public int getFileWhiteListIndex() {
+        return fileWhiteListIndex;
+    }
+
+    public void setFileWhiteListIndex(int fileWhiteListIndex) {
+        this.fileWhiteListIndex = fileWhiteListIndex;
     }
 
     public int getFileIndex() {

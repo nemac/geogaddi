@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -19,17 +20,16 @@ public class PropertiesToObjectTest {
     }
 
     @Test
-    public void testReadFile() throws IOException, URISyntaxException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public void testReadFile() throws URISyntaxException {
         URL resource = PropertiesToObjectTest.class.getResource("/test.properties");
         String testProps = Paths.get(resource.toURI()).toString();
 
         PropertiesToObject pto = new PropertiesToObject(testProps);
-        pto.deserialize();
 
-
-    }
-
-    @After
-    public void tearDown() throws Exception {
+        try {
+            pto.deserialize();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

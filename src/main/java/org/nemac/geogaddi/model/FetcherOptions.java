@@ -1,4 +1,4 @@
-package org.nemac.geogaddi.config.element;
+package org.nemac.geogaddi.model;
 
 import java.util.List;
 

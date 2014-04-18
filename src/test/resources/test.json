@@ -11,13 +11,13 @@
         ],
         "dumpDir": "test/data/dump"
     },
-    "parceler": {
-        "enabled": false,
-        "uncompress": false,
-        "cleanSource": false,
+    "parcelerOptions": {
+        "enabled": true,
+        "uncompress": true,
+        "cleanSource": true,
         "cleanDestination": true,
         "existingFromIntegrator": true,
-        "sourceCsv": [
+        "sourceCSVs": [
             "data/dump/1900.csv.gz",
             "data/dump/1901.csv.gz"
         ],
@@ -30,13 +30,13 @@
         "dataIndex": [1,3],
         "outputDir": "data/output"
     },
-    "integrator": {
-        "enabled": false,
-        "cleanSource":false,
+    "integratorOptions": {
+        "enabled": true,
+        "cleanSource":true,
         "sourceDir": "data/output",
-        "awsAccessKeyId": "",
-        "awsSecretKey": "",
-        "bucketName": ""
+        "awsAccessKeyId": "accessid",
+        "awsSecretKey": "secretkey",
+        "bucketName": "testbucket"
     },
     "deriverOptions": {
         "enabled": false,
