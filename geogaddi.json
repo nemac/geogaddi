@@ -1,7 +1,7 @@
 {
-    "quiet": true,
+    "quiet": false,
     "useAll": false,
-    "uncompress": false,
+    "uncompress": true,
     "fetcher": {
         "enabled": false,
         "uncompress": false,
@@ -13,7 +13,6 @@
     },
     "parceler": {
         "enabled": false,
-        "uncompress": false,
         "cleanSource": false,
         "cleanDestination": true,
         "existingFromIntegrator": true,
@@ -48,7 +47,7 @@
                 "transformation": "YTDCumulative",
                 "folder": "",
                 "file": "PRCP",
-                "normalDir": "",
+                "normalDir": "data/GHCND_NORMALS/NORMAL_YTD_PRCP",
                 "dateIndex": 0,
                 "dataIndex": 1,
                 "outName": "PRCP_YTD"
