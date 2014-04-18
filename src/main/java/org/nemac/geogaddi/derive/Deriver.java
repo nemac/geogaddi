@@ -12,10 +12,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.nemac.geogaddi.config.element.TransformationProperty;
+
 import org.nemac.geogaddi.derive.transformation.AbstractTransformation;
 import org.nemac.geogaddi.derive.transformation.TransformationFactory;
 import org.nemac.geogaddi.derive.transformation.TransformationType;
+import org.nemac.geogaddi.model.TransformationOptions;
 import org.nemac.geogaddi.write.Utils;
 
 public class Deriver {
@@ -23,16 +24,16 @@ public class Deriver {
     private static final String lineFormat = "%s,%s";
     private static final String pathFormat = "%s/%s.%s";
     
-    public static Map<String, Map<String, Set<String>>> derive(String sourceDir, TransformationProperty transformationProperty, boolean uncompress) throws IOException, ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public static Map<String, Map<String, Set<String>>> derive(String sourceDir, TransformationOptions transformationOptions, boolean uncompress) throws IOException, ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         Map<String, Map<String, Set<String>>> derivedMap = new TreeMap<>();
         
         AbstractTransformation transformation;
         
-        if (transformationProperty.getTransformationSourceLib().isEmpty()) {
-            transformation = TransformationFactory.createTransformation(TransformationType.fromType(transformationProperty.getTransformation()));
+        if (transformationOptions.getTransformationSourceLib().isEmpty()) {
+            transformation = TransformationFactory.createTransformation(TransformationType.fromType(transformationOptions.getTransformation()));
         } else {
             // TODO: find the transformation with the reflection factory
-            transformation = TransformationFactory.createTransformation(transformationProperty.getTransformation());
+            transformation = TransformationFactory.createTransformation(transformationOptions.getTransformation());
         }
 
         String[] extensions;
@@ -49,7 +50,7 @@ public class Deriver {
         
         while (files.hasNext()) {
             File file = files.next();
-            if (file.getName().substring(0, file.getName().indexOf(".")).equals(transformationProperty.getFile())) {
+            if (file.getName().substring(0, file.getName().indexOf(".")).equals(transformationOptions.getFile())) {
                 
                 File useFile = file;
                 if (!uncompress) {
@@ -59,14 +60,14 @@ public class Deriver {
                 String folder = FilenameUtils.getBaseName(useFile.getParent());
                 SortedMap<String, Float> dataPairs = linesToMap(FileUtils.readLines(useFile));
                 
-                File normalFile = getNormalFile(transformationProperty.getNormalDir(), folder, extensions[0]);
+                File normalFile = getNormalFile(transformationOptions.getNormalDir(), folder, extensions[0]);
                 
                 if (normalFile.exists()) { // only use if there is a corresponding normal
                     SortedMap<String, Float> normalPairs = linesToMap(FileUtils.readLines(normalFile));
                     SortedMap<String, Float> processedPairs = transformation.process(dataPairs, normalPairs);
                     
                     Map<String, Set<String>> subMap = new TreeMap<>();
-                    subMap.put(transformationProperty.getOutName(),mapToLines(processedPairs));
+                    subMap.put(transformationOptions.getOutName(),mapToLines(processedPairs));
                     derivedMap.put(folder, subMap);
                 }
                 
