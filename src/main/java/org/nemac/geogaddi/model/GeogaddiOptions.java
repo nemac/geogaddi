@@ -3,13 +3,20 @@ package org.nemac.geogaddi.model;
 public class GeogaddiOptions {
     private DeriverOptions deriverOptions;
     private FetcherOptions fetcherOptions;
-    private GeogaddiOptions geogaddiOptions;
     private IntegratorOptions integratorOptions;
     private ParcelerOptions parcelerOptions;
     private TransformationOptions transformationOptions;
     private boolean quiet = true;
     private boolean useAll = false;
     private boolean uncompress = false;
+
+    public GeogaddiOptions() {
+        this.deriverOptions = new DeriverOptions();
+        this.fetcherOptions = new FetcherOptions();
+        this.integratorOptions = new IntegratorOptions();
+        this.parcelerOptions = new ParcelerOptions();
+        this.transformationOptions = new TransformationOptions();
+    }
 
     public DeriverOptions getDeriverOptions() {
         return deriverOptions;
@@ -25,14 +32,6 @@ public class GeogaddiOptions {
 
     public void setFetcherOptions(FetcherOptions fetcherOptions) {
         this.fetcherOptions = fetcherOptions;
-    }
-
-    public GeogaddiOptions getGeogaddiOptions() {
-        return geogaddiOptions;
-    }
-
-    public void setGeogaddiOptions(GeogaddiOptions geogaddiOptions) {
-        this.geogaddiOptions = geogaddiOptions;
     }
 
     public IntegratorOptions getIntegratorOptions() {

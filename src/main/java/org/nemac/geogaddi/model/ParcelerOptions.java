@@ -1,66 +1,69 @@
 package org.nemac.geogaddi.model;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ParcelerOptions {
-    private boolean enabled = true;
-    private boolean uncompress = false;
-    private boolean cleanSource = false;
-    private boolean cleanDestination = true;
-    private boolean existingFromIntegrator = true;
+    private Boolean enabled = true;
+    private Boolean uncompress = false;
+    private Boolean cleanSource = false;
+    private Boolean cleanDestination = true;
+    private Boolean existingFromIntegrator = true;
 //    private String whitelistFileSource;
     private List<String> sourceCSVs;
     private String folderWhiteList = "";
-    private int folderWhiteListIndex = 0;
-    private int folderIndex = 0;
+    private Integer folderWhiteListIndex = 0;
+    private Integer folderIndex = 0;
     private String fileWhiteList;
-    private int fileWhiteListIndex = 2;
-    private int fileIndex = 2;
-    private List<Integer> dataIndexes = Arrays.asList(1, 3);
+    private Integer fileWhiteListIndex = 2;
+    private Integer fileIndex = 2;
+    private List<Integer> dataIndexes; // = Arrays.asList(1, 3);
     private String outputDir = "data/output";
 
-    public boolean isEnabled() {
+    public Boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
-    public boolean isUncompress() {
+    public Boolean isUncompress() {
         return uncompress;
     }
 
-    public void setUncompress(boolean uncompress) {
+    public void setUncompress(Boolean uncompress) {
         this.uncompress = uncompress;
     }
 
-    public boolean isCleanSource() {
+    public Boolean isCleanSource() {
         return cleanSource;
     }
 
-    public void setCleanSource(boolean cleanSource) {
+    public void setCleanSource(Boolean cleanSource) {
         this.cleanSource = cleanSource;
     }
 
-    public boolean isCleanDestination() {
+    public Boolean isCleanDestination() {
         return cleanDestination;
     }
 
-    public void setCleanDestination(boolean cleanDestination) {
+    public void setCleanDestination(Boolean cleanDestination) {
         this.cleanDestination = cleanDestination;
     }
 
-    public boolean isExistingFromIntegrator() {
+    public Boolean isExistingFromIntegrator() {
         return existingFromIntegrator;
     }
 
-    public void setExistingFromIntegrator(boolean existingFromIntegrator) {
+    public void setExistingFromIntegrator(Boolean existingFromIntegrator) {
         this.existingFromIntegrator = existingFromIntegrator;
     }
 
     public List<String> getSourceCSVs() {
+        if (sourceCSVs == null) {
+            sourceCSVs = new ArrayList<>();
+        }
         return sourceCSVs;
     }
 
@@ -76,19 +79,19 @@ public class ParcelerOptions {
         this.folderWhiteList = folderWhiteList;
     }
 
-    public int getFolderWhiteListIndex() {
+    public Integer getFolderWhiteListIndex() {
         return folderWhiteListIndex;
     }
 
-    public void setFolderWhiteListIndex(int folderWhiteListIndex) {
+    public void setFolderWhiteListIndex(Integer folderWhiteListIndex) {
         this.folderWhiteListIndex = folderWhiteListIndex;
     }
 
-    public int getFolderIndex() {
+    public Integer getFolderIndex() {
         return folderIndex;
     }
 
-    public void setFolderIndex(int folderIndex) {
+    public void setFolderIndex(Integer folderIndex) {
         this.folderIndex = folderIndex;
     }
 
@@ -100,23 +103,27 @@ public class ParcelerOptions {
         this.fileWhiteList = fileWhiteList;
     }
 
-    public int getFileWhiteListIndex() {
+    public Integer getFileWhiteListIndex() {
         return fileWhiteListIndex;
     }
 
-    public void setFileWhiteListIndex(int fileWhiteListIndex) {
+    public void setFileWhiteListIndex(Integer fileWhiteListIndex) {
         this.fileWhiteListIndex = fileWhiteListIndex;
     }
 
-    public int getFileIndex() {
+    public Integer getFileIndex() {
         return fileIndex;
     }
 
-    public void setFileIndex(int fileIndex) {
+    public void setFileIndex(Integer fileIndex) {
         this.fileIndex = fileIndex;
     }
 
     public List<Integer> getDataIndexes() {
+        if (dataIndexes == null) {
+            dataIndexes = new ArrayList<>();
+        }
+
         return dataIndexes;
     }
 

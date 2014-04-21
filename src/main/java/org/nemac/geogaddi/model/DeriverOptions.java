@@ -1,5 +1,6 @@
 package org.nemac.geogaddi.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DeriverOptions {
@@ -24,6 +25,9 @@ public class DeriverOptions {
     }
 
     public List<TransformationOptions> getTransformations() {
+        if (transformations == null) {
+            transformations = new ArrayList<>();
+        }
         return transformations;
     }
 

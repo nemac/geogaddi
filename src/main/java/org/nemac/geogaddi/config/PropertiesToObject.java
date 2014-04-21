@@ -3,16 +3,14 @@ package org.nemac.geogaddi.config;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.nemac.geogaddi.model.GeogaddiOptions;
+import org.nemac.geogaddi.model.ParcelerOptions;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
+import java.lang.reflect.*;
+import java.util.*;
 
 public class PropertiesToObject {
     private static final String DEFAULT_PROPERTIES_PATH = "geogaddi.properties";
@@ -24,7 +22,7 @@ public class PropertiesToObject {
         this.propertiesSource = propertiesSource == null ? DEFAULT_PROPERTIES_PATH : propertiesSource;
     }
 
-    public void deserialize() throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, ConfigurationException {
+    public GeogaddiOptions deserialize() throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException, ConfigurationException, NoSuchMethodException, NoSuchFieldException {
         FileReader reader = new FileReader(propertiesSource);
         Properties props = new Properties();
 
@@ -34,48 +32,80 @@ public class PropertiesToObject {
 
         Configuration config = new PropertiesConfiguration(propertiesSource);
 
-        config.getList("color");
+        GeogaddiOptions geogaddiOptions = new GeogaddiOptions();
+        ParcelerOptions parcelerOptions = geogaddiOptions.getParcelerOptions();
 
-        while (e.hasMoreElements()) {
-            String element = (String) e.nextElement();
-            String[] splitElements = element.split("\\.");
+//        Iterator<String> fetcherOptions = config.getKeys("fetcherOptions");
+//        Iterator<String> integratorOptions = config.getKeys("integratorOptions");
+//        Iterator<String> deriverOptions = config.getKeys("deriverOptions");
+        // todo
+//        Iterator<String> transformations = config.getKeys("transformations");
 
-            if ("parceler".equals(splitElements[0])) {
-                Class<?> clazz = Class.forName(PROPERTIES_PACKAGE + "." + capitalizedOptionType(splitElements[0]) + "Options");
-                List<Method> setters = findGettersSetters(clazz);
+        Iterator<String> parcelerOptionKeys = config.getKeys("parcelerOptions");
+        Method[] allMethods = parcelerOptions.getClass().getDeclaredMethods();
 
-                for (Method setter : setters) {
-                    System.out.println(setter.getName());
+        while (parcelerOptionKeys.hasNext()) {
+            String key = parcelerOptionKeys.next();
+            String optionValueToSet = key.split("\\.")[1];
+            List<Object> values = config.getList(key);
+
+            String setterMethodName = "set" + optionValueToSet;
+
+            // find the setter method
+            for (Method method : allMethods) {
+                if (setterMethodName.toLowerCase().equals(method.getName().toLowerCase())) {
+                    Type parameterType = method.getParameterTypes()[0];
+
+                    if (Class.forName(parameterType.getTypeName()).equals(List.class)) {
+                        // find the generic type of the field
+                        Type parameterGenericType = getGenericTypeFor(optionValueToSet);
+
+                        Object[] objects = createTypedObjectArrayFrom(values, parameterGenericType);
+                        method.invoke(parcelerOptions, Arrays.asList(objects));
+                    } else {
+                        // find the constructor for the Type and invoke
+                        Constructor<?> declaredConstructor = declaredConstructorFor(method);
+                        method.invoke(parcelerOptions, declaredConstructor.newInstance(values.get(0)));
+                    }
                 }
-
-                clazz.newInstance();
             }
         }
 
-        System.out.println(props.get("zzz"));
+        return geogaddiOptions;
     }
 
-    private String capitalizedOptionType(final String orig) {
-        return orig.substring(0, 1).toUpperCase() + orig.substring(1);
-    }
-
-    private static List<Method> findGettersSetters(Class<?> c) {
-        List<Method> list = new ArrayList<Method>();
-        Method[] methods = c.getDeclaredMethods();
-
-        for (Method method : methods) {
-            if (isSetter(method)) {
-                list.add(method);
+    @SuppressWarnings("unchecked")
+    private <T> T[] createTypedObjectArrayFrom(List<Object> values, T parameterGenericTypeClass) {
+        Object[] objects = new Object[values.size()];
+        for (int i = 0; i < values.size(); i++) {
+            try {
+                objects[i] = Class.forName(((Class) parameterGenericTypeClass).getTypeName()).getConstructor(String.class).newInstance(values.get(i));
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+                // todo: better error handling
+                e.printStackTrace();
             }
         }
 
-        return list;
+        return (T[]) objects;
     }
 
-    public static boolean isSetter(Method method) {
-        return Modifier.isPublic(method.getModifiers()) &&
-                method.getReturnType().equals(void.class) &&
-                method.getParameterTypes().length == 1 &&
-                method.getName().matches("^set[A-Z].*");
+    private Type getGenericTypeFor(String optionValueToSet) throws NoSuchFieldException {
+        Field declaredField = ParcelerOptions.class.getDeclaredField(optionValueToSet);
+        return ((ParameterizedTypeImpl) declaredField.getGenericType()).getActualTypeArguments()[0];
     }
+
+    private Constructor<?> declaredConstructorFor(Method method) throws ClassNotFoundException, NoSuchMethodException {
+        // get Type of the first parameter (assumes one parameter for a setter method)
+        Type parameterType = method.getParameterTypes()[0];
+
+        Class<?> aClass = Class.forName(parameterType.getTypeName());
+
+        if (aClass.equals(List.class)) {
+            return Arrays.asList().getClass().getDeclaredConstructors()[0];
+        } else {
+            // create constructor for the parameterType
+            return aClass.getDeclaredConstructor(String.class);
+        }
+    }
+
 }

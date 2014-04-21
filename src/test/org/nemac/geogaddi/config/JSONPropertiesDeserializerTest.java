@@ -32,17 +32,18 @@ public class JSONPropertiesDeserializerTest {
 
         ParcelerOptions parcelerOptions = options.getParcelerOptions();
         assertTrue(parcelerOptions.isEnabled());
+        assertTrue(parcelerOptions.isUncompress());
         assertTrue(parcelerOptions.isCleanSource());
         assertTrue(parcelerOptions.isCleanDestination());
         assertTrue(parcelerOptions.isExistingFromIntegrator());
         assertTrue(parcelerOptions.getSourceCSVs().contains("data/dump/1900.csv.gz"));
         assertTrue(parcelerOptions.getSourceCSVs().contains("data/dump/1901.csv.gz"));
         assertEquals("stations.csv", parcelerOptions.getFolderWhiteList());
-        assertEquals(0, parcelerOptions.getFolderWhiteListIndex());
-        assertEquals(0, parcelerOptions.getFolderIndex());
+        assertEquals(0, parcelerOptions.getFolderWhiteListIndex().intValue());
+        assertEquals(0, parcelerOptions.getFolderIndex().intValue());
         assertEquals("vars.csv", parcelerOptions.getFileWhiteList());
-        assertEquals(2, parcelerOptions.getFileWhiteListIndex());
-        assertEquals(2, parcelerOptions.getFileIndex());
+        assertEquals(2, parcelerOptions.getFileWhiteListIndex().intValue());
+        assertEquals(2, parcelerOptions.getFileIndex().intValue());
         assertTrue(parcelerOptions.getDataIndexes().contains(1));
         assertTrue(parcelerOptions.getDataIndexes().contains(3));
         assertEquals("data/output", parcelerOptions.getOutputDir());

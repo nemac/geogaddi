@@ -1,16 +1,19 @@
 package org.nemac.geogaddi.model;
 
 public class TransformationOptions {
-    
-    private final String name;
-    private final String transformationSourceLib;
-    private final String transformation;
-    private final String folder;
-    private final String file;
-    private final String normalDir;
-    private final int dateIndex;
-    private final int dataIndex;
-    private final String outName;
+    private String name;
+    private String transformationSourceLib;
+    private String transformation;
+    private String folder;
+    private String file;
+    private String normalDir;
+    private int dateIndex;
+    private int dataIndex;
+    private String outName;
+
+    public TransformationOptions() {
+
+    }
 
     public TransformationOptions(String name, String transformationSourceLib, String transformation, String folder, String file, String normalSource, int dateIndex, int dataIndex, String outName) {
         this.name = name;
@@ -23,15 +26,15 @@ public class TransformationOptions {
         this.dataIndex = dataIndex;
         this.outName = outName;
     }
-        
+
     public String getName() {
         return name;
     }
-    
+
     public String getTransformationSourceLib() {
         return transformationSourceLib;
     }
-    
+
     public String getTransformation() {
         return transformation;
     }
@@ -55,7 +58,7 @@ public class TransformationOptions {
     public int getDataIndex() {
         return dataIndex;
     }
-    
+
     public String getOutName() {
         return outName;
     }

@@ -27,7 +27,7 @@
         "fileWhiteList": "vars.csv",
         "fileWhiteListIndex": 2,
         "fileIndex": 2,
-        "dataIndex": [1,3],
+        "dataIndexes": [1,3],
         "outputDir": "data/output"
     },
     "integratorOptions": {

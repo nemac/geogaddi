@@ -1,5 +1,6 @@
 package org.nemac.geogaddi.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FetcherOptions {
@@ -25,6 +26,9 @@ public class FetcherOptions {
     }
 
     public List<String> getSources() {
+        if (sources == null) {
+            sources = new ArrayList<>();
+        }
         return sources;
     }
 
