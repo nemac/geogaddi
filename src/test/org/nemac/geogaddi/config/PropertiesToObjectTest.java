@@ -3,6 +3,7 @@ package org.nemac.geogaddi.config;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
+import org.nemac.geogaddi.exception.PropertiesParseException;
 import org.nemac.geogaddi.model.*;
 
 import java.io.IOException;
@@ -11,9 +12,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PropertiesToObjectTest {
 
@@ -22,7 +21,7 @@ public class PropertiesToObjectTest {
     }
 
     @Test
-    public void testReadFile() throws URISyntaxException, IllegalAccessException, ConfigurationException, IOException, InstantiationException, NoSuchMethodException, InvocationTargetException, ClassNotFoundException, NoSuchFieldException {
+    public void testReadFile() throws URISyntaxException, IllegalAccessException, ConfigurationException, IOException, InstantiationException, NoSuchMethodException, InvocationTargetException, ClassNotFoundException, NoSuchFieldException, PropertiesParseException {
         URL resource = PropertiesToObjectTest.class.getResource("/test.properties");
         String testProps = Paths.get(resource.toURI()).toString();
 

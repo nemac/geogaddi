@@ -5,6 +5,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.nemac.geogaddi.derive.transformation.AbstractTransformation;
 import org.nemac.geogaddi.derive.transformation.TransformationFactory;
 import org.nemac.geogaddi.derive.transformation.TransformationType;
+import org.nemac.geogaddi.model.DeriverOptions;
+import org.nemac.geogaddi.model.GeogaddiOptions;
 import org.nemac.geogaddi.model.TransformationOption;
 import org.nemac.geogaddi.write.Utils;
 
@@ -14,11 +16,12 @@ import java.text.ParseException;
 import java.util.*;
 
 public class Deriver {
+    private static final String LINE_FORMAT = "%s,%s";
+    private static final String PATH_FORMAT = "%s/%s.%s";
+    private static final DeriverOptions DERIVER_OPTIONS = GeogaddiOptions.getDeriverOptions();
+    private static final boolean isUncompress = GeogaddiOptions.isUncompress();
     
-    private static final String lineFormat = "%s,%s";
-    private static final String pathFormat = "%s/%s.%s";
-    
-    public static Map<String, Map<String, Set<String>>> derive(String sourceDir, TransformationOption transformationOption, boolean uncompress) throws IOException, ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public static Map<String, Map<String, Set<String>>> derive(TransformationOption transformationOption) throws IOException, ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         Map<String, Map<String, Set<String>>> derivedMap = new TreeMap<>();
         
         AbstractTransformation transformation;
@@ -32,7 +35,7 @@ public class Deriver {
 
         String[] extensions;
         
-        if (uncompress) {
+        if (isUncompress) {
             String[] unExt = {"csv"};
             extensions = unExt;
         } else {
@@ -40,14 +43,14 @@ public class Deriver {
             extensions = comExt;
         }
         
-        Iterator<File> files = FileUtils.iterateFiles(new File(sourceDir), extensions, true);
+        Iterator<File> files = FileUtils.iterateFiles(new File(DERIVER_OPTIONS.getSourceDir()), extensions, true);
         
         while (files.hasNext()) {
             File file = files.next();
             if (file.getName().substring(0, file.getName().indexOf(".")).equals(transformationOption.getFile())) {
                 
                 File useFile = file;
-                if (!uncompress) {
+                if (!isUncompress) {
                     useFile = new File(Utils.uncompress(file.getCanonicalPath(), false));
                 }
                 
@@ -65,7 +68,7 @@ public class Deriver {
                     derivedMap.put(folder, subMap);
                 }
                 
-                if (!uncompress) {
+                if (!isUncompress) {
                     FileUtils.deleteQuietly(useFile);
                 }
             }
@@ -78,7 +81,7 @@ public class Deriver {
     // DATA: station/var.csv
     // NORMALS: NORMAL_VAR/station.csv
     private static File getNormalFile(String baseDir, String dataFolder, String extension) {
-        String path = String.format(pathFormat, Utils.conformDirectoryString(baseDir), dataFolder, extension);
+        String path = String.format(PATH_FORMAT, Utils.conformDirectoryString(baseDir), dataFolder, extension);
         return new File(path);
     }
     
@@ -99,7 +102,7 @@ public class Deriver {
         Set<String> set = new TreeSet<>();
         
         for (Map.Entry<String, Float> entry : map.entrySet()) {
-            set.add(String.format(lineFormat, entry.getKey(), Math.round(entry.getValue())));
+            set.add(String.format(LINE_FORMAT, entry.getKey(), Math.round(entry.getValue())));
         }
         
         return set;

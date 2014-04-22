@@ -15,18 +15,6 @@ public class TransformationOption {
 
     }
 
-//    public TransformationOption(String name, String transformationSourceLib, String transformation, String folder, String file, String normalSource, Integer dateIndex, Integer dataIndex, String outName) {
-//        this.name = name;
-//        this.transformationSourceLib = transformationSourceLib;
-//        this.transformation = transformation;
-//        this.folder = folder;
-//        this.file = file;
-//        this.normalDir = normalSource;
-//        this.dateIndex = dateIndex;
-//        this.dataIndex = dataIndex;
-//        this.outName = outName;
-//    }
-
     public String getName() {
         return name;
     }

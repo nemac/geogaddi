@@ -1,6 +1,5 @@
 package org.nemac.geogaddi.fetch;
 
-import org.nemac.geogaddi.Geogaddi;
 import org.nemac.geogaddi.model.FetcherOptions;
 import org.nemac.geogaddi.model.GeogaddiOptions;
 import org.nemac.geogaddi.write.Utils;
@@ -15,22 +14,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Fetcher {
-    private static FetcherOptions fetcherOptions;
+    private static final FetcherOptions fetcherOptions = GeogaddiOptions.getFetcherOptions();
+    private static final boolean isUncompress = GeogaddiOptions.isUncompress();
+    private static final boolean isQuiet = GeogaddiOptions.isQuiet();
 
-    public static List<String> multiFetch(FetcherOptions fetcherOpts, boolean isUncompress, boolean isQuiet) throws IOException {
-        fetcherOptions = fetcherOpts;
-
+    public static List<String> multiFetch() throws IOException {
         List<String> outputFiles = new ArrayList<String>();
         for (String sourceUrlPath : fetcherOptions.getSources()) {
-            outputFiles.add(fetch(sourceUrlPath, isUncompress, isQuiet));
+            outputFiles.add(fetch(sourceUrlPath));
         }
 
         return outputFiles;
     }
 
-    private static String fetch(String sourceUrlPath, Boolean isUncompress, Boolean isQuiet) throws IOException {
+    private static String fetch(String sourceUrlPath) throws IOException {
         String destinationDirectory = fetcherOptions.getDumpDir();
-        String downloadedFilePath = download(sourceUrlPath, destinationDirectory, isQuiet);
+        String downloadedFilePath = download(sourceUrlPath, destinationDirectory);
 
         if (isUncompress) {
             return destinationDirectory + Utils.uncompress(downloadedFilePath, destinationDirectory);
@@ -39,8 +38,8 @@ public class Fetcher {
         }
     }
 
-    private static String download(String sourceUrlPath, String destinationDirectory, boolean quiet) throws IOException {
-        if (!quiet) System.out.println(sourceUrlPath + " is downloading to " + destinationDirectory);
+    private static String download(String sourceUrlPath, String destinationDirectory) throws IOException {
+        if (!isQuiet) System.out.println(sourceUrlPath + " is downloading to " + destinationDirectory);
         URL url = new URL(sourceUrlPath);
         URLConnection downloader = url.openConnection(); // new FtpURLConnection(url);
         InputStream inputStream = downloader.getInputStream();
@@ -61,7 +60,7 @@ public class Fetcher {
         inputStream.close();
         outputStream.close();
 
-        if (!quiet) System.out.println("... download complete");
+        if (!isQuiet) System.out.println("... download complete");
         return outputFilePath;
     }
 }

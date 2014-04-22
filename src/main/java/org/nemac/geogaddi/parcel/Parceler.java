@@ -2,32 +2,28 @@ package org.nemac.geogaddi.parcel;
 
 import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.lang3.StringUtils;
+import org.nemac.geogaddi.model.GeogaddiOptions;
 import org.nemac.geogaddi.model.ParcelerOptions;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 public final class Parceler {
-    static boolean isQuiet;
-    static ParcelerOptions parcelerOptions;
+    private static final ParcelerOptions parcelerOptions = GeogaddiOptions.getParcelerOptions();
+    private static final boolean isUncompress = GeogaddiOptions.isUncompress();
+    private static final boolean isQuiet = GeogaddiOptions.isQuiet();
     
-    private Parceler() {
-        
-    }
 
-//    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String folderWhiteListSource, int folderWhiteListIdx, int folderIdx, String fileWhiteListSource, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed, boolean quiet) throws IOException {
-    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, ParcelerOptions parcelerOpts, boolean isUncompress, boolean geodaddiIsQuiet) throws IOException {
-        isQuiet = geodaddiIsQuiet;
-        parcelerOptions = parcelerOpts;
-
-        Set<String> folderWhiteList = buildWhitelist(parcelerOpts.getFolderWhiteList());
-        Set<String> fileWhiteList = buildWhitelist(parcelerOpts.getFileWhiteList());
+    public static Map<String, Map<String, Set<String>>> parcel(String csvSource) throws IOException {
+        Set<String> folderWhiteList = buildWhitelist(parcelerOptions.getFolderWhiteList());
+        Set<String> fileWhiteList = buildWhitelist(parcelerOptions.getFileWhiteList());
 
         return hashSourceData(folderWhiteList, fileWhiteList, csvSource);
     }
-
-
 
     private static Set<String> buildWhitelist(String whiteListSource) throws IOException {
         if (!isQuiet) System.out.println("Building whitelist ");

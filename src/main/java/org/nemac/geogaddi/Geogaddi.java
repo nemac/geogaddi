@@ -3,7 +3,6 @@ package org.nemac.geogaddi;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.nemac.geogaddi.config.GeogaddiOptionsFactory;
-import org.nemac.geogaddi.config.PropertiesManager;
 import org.nemac.geogaddi.config.PropertyManagerTypeEnum;
 import org.nemac.geogaddi.derive.Deriver;
 import org.nemac.geogaddi.exception.PropertiesParseException;
@@ -27,9 +26,6 @@ import java.util.logging.Logger;
 public class Geogaddi {
 
 //    private static PropertiesManager props;
-
-    private static GeogaddiOptions;
-
 
     // command-line util
     public static void main(String args[]) throws InterruptedException, java.text.ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException, PropertiesParseException {
@@ -71,7 +67,6 @@ public class Geogaddi {
             boolean integrateEnabled = geogaddiOptions.getIntegratorOptions().isEnabled();
             boolean deriverEnabled = geogaddiOptions.getDeriverOptions().isEnabled() && cmd.hasOption("j");
 
-            boolean uncompress = geogaddiOptions.isUncompress();
 
             boolean cleanFetcherSource = geogaddiOptions.getParcelerOptions().isCleanSource();
             boolean cleanDestinationBeforeWrite = geogaddiOptions.getParcelerOptions().isCleanDestination();
@@ -88,9 +83,10 @@ public class Geogaddi {
             // TODO: make summarizer more sophisticated so as not to clobber the summary on using deriver only
             Summarizer summarizer = new Summarizer();
 
+            String destDirPath = geogaddiOptions.getParcelerOptions().getOutputDir();
+
             if (allEnabled || fetchEnabled) {
-//                csvSources = Fetcher.multiFetch(props.getFetchUrls(), props.getDumpDir(), uncompress, quiet);
-                csvSources = Fetcher.multiFetch(geogaddiOptions.getFetcherOptions(), geogaddiOptions.isUncompress(), geogaddiOptions.isQuiet());
+                csvSources = Fetcher.multiFetch();
             }
 
             if (allEnabled || parcelEnabled) {
@@ -100,7 +96,7 @@ public class Geogaddi {
                 }
 
                 if (cleanDestinationBeforeWrite) {
-                    File destDir = new File(geogaddiOptions.getParcelerOptions().getOutputDir());
+                    File destDir = new File(destDirPath);
 
                     if (cleanDestinationBeforeWrite && destDir.exists()) {
                         if (!quiet) System.out.println("Cleaning directory " + destDir.getPath());
@@ -110,9 +106,9 @@ public class Geogaddi {
                 }
 
                 for (String csvSource : csvSources) {
-                    Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(String csvSource, geogaddiOptions.getParcelerOptions(), uncompress, quiet);
+                    Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource);
 
-                    Writer.write(parcelMap, props.getDestinatonDir(), uncompress, summarizer, quiet);
+                    Writer.write(parcelMap, summarizer, destDirPath);
 
                     // clean up downloaded file
                     if (cleanFetcherSource) {
@@ -122,26 +118,26 @@ public class Geogaddi {
             }
 
             if ((allEnabled && cmd.hasOption("j")) || deriverEnabled) {
-                for (TransformationOption transformation : props.getTransformationOptions()) {
-                    Map<String, Map<String, Set<String>>> derived = Deriver.derive(props.getDeriverSourceDir(), transformation, uncompress);
-                    Writer.write(derived, props.getDestinatonDir(), uncompress, summarizer, quiet);
+                for (TransformationOption transformation : geogaddiOptions.getDeriverOptions().getTransformationOptions()) {
+                    Map<String, Map<String, Set<String>>> derived = Deriver.derive(transformation);
+                    Writer.write(derived, summarizer, destDirPath);
                 }
             }
 
             if (allEnabled || parcelEnabled || deriverEnabled) {
                 // write out summary
-                FileUtils.writeStringToFile(new File(props.getDestinatonDir() + "/summary.json"), summarizer.jsonSummary());
+                FileUtils.writeStringToFile(new File(destDirPath + "/summary.json"), summarizer.jsonSummary());
             }
 
             if (allEnabled || integrateEnabled) {
                 String destDir;
                 if (!allEnabled && !parcelEnabled) {
-                    destDir = props.getIntegratorSourceDir();
+                    destDir = geogaddiOptions.getIntegratorOptions().getSourceDir();
                 } else {
-                    destDir = props.getDestinatonDir();
+                    destDir = destDirPath;
                 }
 
-                Integrator.integrate(props.getCredentials(), destDir, props.getBucketName(), cleanDestinationBeforeWrite, uncompress, quiet);
+                Integrator.integrate(cleanDestinationBeforeWrite);
 
                  if (cleanIntegratorSource) {
                      if (!quiet) System.out.println("Deleting " + destDir);

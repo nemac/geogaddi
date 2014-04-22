@@ -24,7 +24,7 @@ public class PropertiesToObject {
 
     public GeogaddiOptions deserialize() throws PropertiesParseException {
         Configuration config = null;
-        GeogaddiOptions geogaddiOptions = new GeogaddiOptions();
+        GeogaddiOptions geogaddiOptions = GeogaddiOptions.getInstance();
 
         try {
             config = new PropertiesConfiguration(propertiesSource);

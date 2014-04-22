@@ -1,6 +1,7 @@
 package org.nemac.geogaddi.config;
 
 import org.junit.Test;
+import org.nemac.geogaddi.exception.PropertiesParseException;
 import org.nemac.geogaddi.model.*;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import static org.junit.Assert.*;
 public class JSONPropertiesDeserializerTest {
 
     @Test
-    public void testDeserialize() throws IOException, URISyntaxException {
+    public void testDeserialize() throws IOException, URISyntaxException, PropertiesParseException {
         URL resource = PropertiesToObjectTest.class.getResource("/test.json");
         String testProps = Paths.get(resource.toURI()).toString();
 

@@ -1,7 +1,7 @@
 package org.nemac.geogaddi.integrate;
 
 import com.amazonaws.AmazonClientException;
-import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -10,13 +10,22 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.ObjectMetadataProvider;
 import com.amazonaws.services.s3.transfer.TransferManager;
+import org.nemac.geogaddi.model.GeogaddiOptions;
+import org.nemac.geogaddi.model.IntegratorOptions;
 
 import java.io.File;
 
 public class Integrator {
+    private static final IntegratorOptions INTEGRATOR_OPTIONS = GeogaddiOptions.getIntegratorOptions();
+    private static final boolean isUncompress = GeogaddiOptions.isUncompress();
+    private static final boolean isQuiet = GeogaddiOptions.isQuiet();
     
-    public static void integrate(AWSCredentials credentials, String sourceDir, String bucketName, boolean clean, boolean uncompressed, boolean quiet) throws AmazonClientException, InterruptedException  {
-        if (!quiet) System.out.println("Transferring content to S3");
+    public static void integrate(boolean clean) throws AmazonClientException, InterruptedException  {
+        BasicAWSCredentials credentials = new BasicAWSCredentials(INTEGRATOR_OPTIONS.getAwsAccessKeyId(), INTEGRATOR_OPTIONS.getAwsSecretKey());
+
+        String bucketName = INTEGRATOR_OPTIONS.getBucketName();
+
+        if (!isQuiet) System.out.println("Transferring content to S3");
 
         AmazonS3 s3 = new AmazonS3Client(credentials);
         s3.setRegion(Region.getRegion(Regions.US_EAST_1)); // TODO: parameterize?
@@ -26,13 +35,14 @@ public class Integrator {
         }
 
         if (clean) {
-            BucketDestroy.emptyBucket(s3, bucketName, quiet);
+            BucketDestroy.emptyBucket(s3, bucketName, isQuiet);
         }
 
         TransferManager transfer = new TransferManager(s3);
         
         MultipleFileUpload upload;
-        if (uncompressed) {
+        String sourceDir = INTEGRATOR_OPTIONS.getSourceDir();
+        if (isUncompress) {
             upload  = transfer.uploadDirectory(bucketName, null, new File(sourceDir), true);
         } else {
             ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
@@ -49,12 +59,12 @@ public class Integrator {
             upload = transfer.uploadDirectory(bucketName, null, new File(sourceDir), true, metadataProvider);
         }
         
-        if (!quiet) upload.addProgressListener(new IntegratorProgressListener());
+        if (!isQuiet) upload.addProgressListener(new IntegratorProgressListener());
         
         upload.waitForCompletion();
         
         transfer.shutdownNow();
 
-        if (!quiet) System.out.println("... content transferred to S3");
+        if (!isQuiet) System.out.println("... content transferred to S3");
     }
 }
