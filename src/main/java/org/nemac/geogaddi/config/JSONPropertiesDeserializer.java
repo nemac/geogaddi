@@ -2,10 +2,10 @@ package org.nemac.geogaddi.config;
 
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
+import org.nemac.geogaddi.exception.PropertiesParseException;
 import org.nemac.geogaddi.model.GeogaddiOptions;
 
 import java.io.File;
-import java.io.IOException;
 
 public class JSONPropertiesDeserializer {
     private static final String DEFAULT_PROPERTIES_PATH = "geogaddi.json";
@@ -16,10 +16,15 @@ public class JSONPropertiesDeserializer {
         this.propertiesSource = propertiesSource == null ? DEFAULT_PROPERTIES_PATH : propertiesSource;
     }
 
-    public GeogaddiOptions deserialize() throws IOException {
-        String jsonPropsString = FileUtils.readFileToString(new File(propertiesSource));
+    public GeogaddiOptions deserialize() throws PropertiesParseException {
+        GeogaddiOptions geogaddiOptions = new GeogaddiOptions();
 
-        GeogaddiOptions geogaddiOptions = new Gson().fromJson(jsonPropsString, GeogaddiOptions.class);
+        try {
+            String jsonPropsString = FileUtils.readFileToString(new File(propertiesSource));
+            geogaddiOptions = new Gson().fromJson(jsonPropsString, GeogaddiOptions.class);
+        } catch (Exception e) {
+            throw new PropertiesParseException("Failed to parse properties file: " + propertiesSource, e);
+        }
 
         return geogaddiOptions;
     }

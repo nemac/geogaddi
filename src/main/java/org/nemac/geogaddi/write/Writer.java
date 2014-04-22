@@ -1,16 +1,12 @@
 package org.nemac.geogaddi.write;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.commons.io.FileUtils;
 import org.nemac.geogaddi.parcel.summary.Summarizer;
 import org.nemac.geogaddi.parcel.summary.SummaryState;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class Writer {
 

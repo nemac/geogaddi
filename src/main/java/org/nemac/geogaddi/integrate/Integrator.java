@@ -1,8 +1,6 @@
 package org.nemac.geogaddi.integrate;
 
 import com.amazonaws.AmazonClientException;
-import java.io.File;
-
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -12,6 +10,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.ObjectMetadataProvider;
 import com.amazonaws.services.s3.transfer.TransferManager;
+
+import java.io.File;
 
 public class Integrator {
     

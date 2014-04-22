@@ -4,24 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FetcherOptions {
-    private boolean enabled;
-    private boolean uncompress;
+    private Boolean enabled;
+    private Boolean uncompress;
     private List<String> sources;
     private String dumpDir;
 
-    public boolean isEnabled() {
+    public Boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
-    public boolean isUncompress() {
+    public Boolean isUncompress() {
         return uncompress;
     }
 
-    public void setUncompress(boolean uncompress) {
+    public void setUncompress(Boolean uncompress) {
         this.uncompress = uncompress;
     }
 

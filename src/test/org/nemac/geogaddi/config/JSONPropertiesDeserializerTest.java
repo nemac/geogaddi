@@ -59,19 +59,18 @@ public class JSONPropertiesDeserializerTest {
         DeriverOptions deriverOptions = options.getDeriverOptions();
         assertFalse(deriverOptions.isEnabled());
         assertEquals("test/data/output", deriverOptions.getSourceDir());
-        assertEquals(2, deriverOptions.getTransformations().size());
+        assertEquals(2, deriverOptions.getTransformationOptions().size());
 
-        TransformationOptions transformationOptions = deriverOptions.getTransformations().get(0);
-        assertEquals("First Transformation", transformationOptions.getName());
-        assertEquals("testSourceLib", transformationOptions.getTransformationSourceLib());
-        assertEquals("YTDCumulative", transformationOptions.getTransformation());
-        assertEquals("testTransformationFolder", transformationOptions.getFolder());
-        assertEquals("PRCP", transformationOptions.getFile());
-        assertEquals("testNormalDir", transformationOptions.getNormalDir());
-        assertEquals(0, transformationOptions.getDateIndex());
-        assertEquals(1, transformationOptions.getDataIndex());
-        assertEquals("PRCP_YTD", transformationOptions.getOutName());
-
+        TransformationOption transformationOption = deriverOptions.getTransformationOptions().get(0);
+        assertEquals("First Transformation", transformationOption.getName());
+        assertEquals("testSourceLib", transformationOption.getTransformationSourceLib());
+        assertEquals("YTDCumulative", transformationOption.getTransformation());
+        assertEquals("testTransformationFolder", transformationOption.getFolder());
+        assertEquals("PRCP", transformationOption.getFile());
+        assertEquals("testNormalDir", transformationOption.getNormalDir());
+        assertTrue(0 == transformationOption.getDateIndex());
+        assertTrue(1 == transformationOption.getDataIndex());
+        assertEquals("PRCP_YTD", transformationOption.getOutName());
     }
 
 }

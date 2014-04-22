@@ -1,12 +1,13 @@
 package org.nemac.geogaddi.write;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import org.apache.commons.io.FileUtils;
 
 public class Utils {
     private static final String COMPRESSION_EXTENSION = ".gz";

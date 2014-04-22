@@ -1,40 +1,40 @@
 package org.nemac.geogaddi.parcel;
 
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import au.com.bytecode.opencsv.CSVReader;
+import org.apache.commons.lang3.StringUtils;
+import org.nemac.geogaddi.model.ParcelerOptions;
+
+import java.io.*;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.lang3.StringUtils;
-
-import au.com.bytecode.opencsv.CSVReader;
-
 public final class Parceler {
+    static boolean isQuiet;
+    static ParcelerOptions parcelerOptions;
     
     private Parceler() {
         
     }
 
-    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String folderWhiteListSource, int folderWhiteListIdx, int folderIdx, String fileWhiteListSource, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed, boolean quiet) throws IOException {
-        Set<String> folderWhiteList = buildWhitelist(folderWhiteListSource, quiet);
-        Set<String> fileWhiteList = buildWhitelist(fileWhiteListSource, quiet);
-        return hashSourceData(csvSource, folderWhiteList, folderWhiteListIdx, folderIdx, fileWhiteList, fileWhiteListIdx, fileIdx, dataIdxArr, isSourceUncompressed, quiet);
+//    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, String destDir, String folderWhiteListSource, int folderWhiteListIdx, int folderIdx, String fileWhiteListSource, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed, boolean quiet) throws IOException {
+    public static Map<String, Map<String, Set<String>>> parcel(String csvSource, ParcelerOptions parcelerOpts, boolean isUncompress, boolean geodaddiIsQuiet) throws IOException {
+        isQuiet = geodaddiIsQuiet;
+        parcelerOptions = parcelerOpts;
+
+        Set<String> folderWhiteList = buildWhitelist(parcelerOpts.getFolderWhiteList());
+        Set<String> fileWhiteList = buildWhitelist(parcelerOpts.getFileWhiteList());
+
+        return hashSourceData(folderWhiteList, fileWhiteList, csvSource);
     }
 
-    private static Set<String> buildWhitelist(String whiteListSource, boolean quiet) throws IOException {
-        if (!quiet) System.out.println("Building whitelist ");
+
+
+    private static Set<String> buildWhitelist(String whiteListSource) throws IOException {
+        if (!isQuiet) System.out.println("Building whitelist ");
         Set<String> whiteList = new HashSet<String>();
 
         if (whiteListSource != null && !whiteListSource.isEmpty()) {
-            if (!quiet) System.out.print("from " + whiteListSource);
+            if (!isQuiet) System.out.print("from " + whiteListSource);
             CSVReader whiteListReader = new CSVReader(new FileReader(whiteListSource));
             String[] nextLine;
             while ((nextLine = whiteListReader.readNext()) != null) {
@@ -43,15 +43,15 @@ public final class Parceler {
 
             whiteListReader.close();
 
-            if (!quiet) System.out.println("... whitelist built with " + whiteList.size() + " items");
+            if (!isQuiet) System.out.println("... whitelist built with " + whiteList.size() + " items");
         } else {
-            if (!quiet) System.out.println("... whitelist not found, no filtering will be perfomred");
+            if (!isQuiet) System.out.println("... whitelist not found, no filtering will be perfomred");
         }
 
         return whiteList;
     }
 
-    private static Map<String, Map<String, Set<String>>> hashSourceData(String sourceCSV, Set<String> folderWhiteList, int folderWhiteListIdx, int folderIdx, Set<String> fileWhiteList, int fileWhiteListIdx, int fileIdx, int[] dataIdxArr, boolean isSourceUncompressed, boolean quiet) throws IOException {
+    private static Map<String, Map<String, Set<String>>> hashSourceData(Set<String> folderWhiteList, Set<String> fileWhiteList, String csvSource) throws IOException {
     	// The data are hashed as follows
         // Map
         // 	String -> Folder
@@ -59,27 +59,31 @@ public final class Parceler {
         //    String -> File
         //    Set   -> Row data
 
-        if (!quiet) System.out.println("Hashing " + sourceCSV);
+        if (!isQuiet) System.out.println("Hashing " + csvSource);
         Map<String, Map<String, Set<String>>> folderHash = new TreeMap<String, Map<String, Set<String>>>();
 
         CSVReader dataReader;
-        if (isSourceUncompressed) {
-            dataReader = new CSVReader(new FileReader(sourceCSV));
+        if (parcelerOptions.isUncompress()) {
+            dataReader = new CSVReader(new FileReader(csvSource));
         } else {
-            GZIPInputStream in = new GZIPInputStream(new FileInputStream(sourceCSV));
+            GZIPInputStream in = new GZIPInputStream(new FileInputStream(csvSource));
             dataReader = new CSVReader(new InputStreamReader(in));
         }
 
         String[] nextLine;
         while ((nextLine = dataReader.readNext()) != null) {
             // compare to whitelist - check if whitelist isn't empty and doesn't contain the current key 
-            if (!folderWhiteList.isEmpty() && !folderWhiteList.contains(nextLine[folderWhiteListIdx])) {
+            if (!folderWhiteList.isEmpty() && !folderWhiteList.contains(nextLine[parcelerOptions.getFolderWhiteListIndex()])) {
                 continue;
             }
             
-            if (!fileWhiteList.isEmpty() && !fileWhiteList.contains(nextLine[fileWhiteListIdx])) {
+            if (!fileWhiteList.isEmpty() && !fileWhiteList.contains(nextLine[parcelerOptions.getFileWhiteListIndex()])) {
                 continue;
             }
+
+            Integer folderIdx = parcelerOptions.getFolderIndex();
+            Integer fileIdx = parcelerOptions.getFileIndex();
+            List<Integer> dataIdxArr = parcelerOptions.getDataIndexes();
 
             if (folderHash.containsKey(nextLine[folderIdx])) { // add to existing folder hash item
                 Map<String, Set<String>> fileHash = folderHash.get(nextLine[folderIdx]);
@@ -104,11 +108,11 @@ public final class Parceler {
 
         dataReader.close();
 
-        if (!quiet) System.out.println("... CSV file hashed");
+        if (!isQuiet) System.out.println("... CSV file hashed");
         return folderHash;
     }
 
-    private static String getDataRow(String[] csvRow, int[] dataIdxArr) {
+    private static String getDataRow(String[] csvRow, List<Integer> dataIdxArr) {
         List<String> rowData = new ArrayList<String>();
 
         // loop over items in data index, add to row data

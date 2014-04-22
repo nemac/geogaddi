@@ -5,17 +5,17 @@ public class GeogaddiOptions {
     private FetcherOptions fetcherOptions;
     private IntegratorOptions integratorOptions;
     private ParcelerOptions parcelerOptions;
-    private TransformationOptions transformationOptions;
-    private boolean quiet = true;
-    private boolean useAll = false;
-    private boolean uncompress = false;
+    private TransformationOption transformationOption;
+    private Boolean quiet = false;
+    private Boolean useAll = false;
+    private Boolean uncompress = false;
 
     public GeogaddiOptions() {
         this.deriverOptions = new DeriverOptions();
         this.fetcherOptions = new FetcherOptions();
         this.integratorOptions = new IntegratorOptions();
         this.parcelerOptions = new ParcelerOptions();
-        this.transformationOptions = new TransformationOptions();
+        this.transformationOption = new TransformationOption();
     }
 
     public DeriverOptions getDeriverOptions() {
@@ -50,35 +50,35 @@ public class GeogaddiOptions {
         this.parcelerOptions = parcelerOptions;
     }
 
-    public TransformationOptions getTransformationOptions() {
-        return transformationOptions;
+    public TransformationOption getTransformationOption() {
+        return transformationOption;
     }
 
-    public void setTransformationOptions(TransformationOptions transformationOptions) {
-        this.transformationOptions = transformationOptions;
+    public void setTransformationOption(TransformationOption transformationOption) {
+        this.transformationOption = transformationOption;
     }
 
-    public boolean isQuiet() {
+    public Boolean isQuiet() {
         return quiet;
     }
 
-    public void setQuiet(boolean quiet) {
+    public void setQuiet(Boolean quiet) {
         this.quiet = quiet;
     }
 
-    public boolean isUseAll() {
+    public Boolean isUseAll() {
         return useAll;
     }
 
-    public void setUseAll(boolean useAll) {
+    public void setUseAll(Boolean useAll) {
         this.useAll = useAll;
     }
 
-    public boolean isUncompress() {
+    public Boolean isUncompress() {
         return uncompress;
     }
 
-    public void setUncompress(boolean uncompress) {
+    public void setUncompress(Boolean uncompress) {
         this.uncompress = uncompress;
     }
 }

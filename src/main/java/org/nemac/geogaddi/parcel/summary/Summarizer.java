@@ -1,11 +1,8 @@
 package org.nemac.geogaddi.parcel.summary;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import org.json.JSONObject;
+
+import java.util.*;
 
 public class Summarizer {
     

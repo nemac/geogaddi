@@ -1,26 +1,26 @@
 package org.nemac.geogaddi.model;
 
 public class IntegratorOptions {
-    private boolean enabled = false;
-    private boolean cleanSource = false;
+    private Boolean enabled = false;
+    private Boolean cleanSource = false;
     private String sourceDir = "data/output";
     private String awsAccessKeyId;
     private String awsSecretKey;
     private String bucketName;
 
-    public boolean isEnabled() {
+    public Boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
-    public boolean isCleanSource() {
+    public Boolean isCleanSource() {
         return cleanSource;
     }
 
-    public void setCleanSource(boolean cleanSource) {
+    public void setCleanSource(Boolean cleanSource) {
         this.cleanSource = cleanSource;
     }
 

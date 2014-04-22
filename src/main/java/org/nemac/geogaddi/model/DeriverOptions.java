@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DeriverOptions {
-    private boolean enabled = true;
+    private Boolean enabled = true;
     private String sourceDir = "data/output";
-    private List<TransformationOptions> transformations;
+    private List<TransformationOption> transformationOptions;
 
-    public boolean isEnabled() {
+    public Boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
@@ -24,14 +24,14 @@ public class DeriverOptions {
         this.sourceDir = sourceDir;
     }
 
-    public List<TransformationOptions> getTransformations() {
-        if (transformations == null) {
-            transformations = new ArrayList<>();
+    public List<TransformationOption> getTransformationOptions() {
+        if (transformationOptions == null) {
+            transformationOptions = new ArrayList<>();
         }
-        return transformations;
+        return transformationOptions;
     }
 
-    public void setTransformations(List<TransformationOptions> transformations) {
-        this.transformations = transformations;
+    public void setTransformationOptions(List<TransformationOption> transformationOptions) {
+        this.transformationOptions = transformationOptions;
     }
 }

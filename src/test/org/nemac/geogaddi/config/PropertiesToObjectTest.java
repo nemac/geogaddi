@@ -1,23 +1,18 @@
 package org.nemac.geogaddi.config;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.nemac.geogaddi.model.GeogaddiOptions;
-import org.nemac.geogaddi.model.ParcelerOptions;
+import org.nemac.geogaddi.model.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class PropertiesToObjectTest {
@@ -34,6 +29,17 @@ public class PropertiesToObjectTest {
         PropertiesToObject pto = new PropertiesToObject(testProps);
 
         GeogaddiOptions options = pto.deserialize();
+        assertFalse(options.isQuiet());
+        assertTrue(options.isUseAll());
+        assertTrue(options.isUncompress());
+
+        FetcherOptions fetcherOptions = options.getFetcherOptions();
+        assertTrue(fetcherOptions.isEnabled());
+        assertTrue(fetcherOptions.isUncompress());
+        assertEquals("test/data/dump", fetcherOptions.getDumpDir());
+        assertEquals(2, fetcherOptions.getSources().size());
+        assertTrue(fetcherOptions.getSources().contains("ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1900.csv.gz"));
+        assertTrue(fetcherOptions.getSources().contains("ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1901.csv.gz"));
 
         ParcelerOptions parcelerOptions = options.getParcelerOptions();
         assertTrue(parcelerOptions.isEnabled());
@@ -52,5 +58,30 @@ public class PropertiesToObjectTest {
         assertTrue(parcelerOptions.getDataIndexes().contains(1));
         assertTrue(parcelerOptions.getDataIndexes().contains(3));
         assertEquals("data/output", parcelerOptions.getOutputDir());
+
+        IntegratorOptions integratorOptions = options.getIntegratorOptions();
+        assertTrue(integratorOptions.isEnabled());
+        assertTrue(integratorOptions.isCleanSource());
+        assertEquals("data/output", integratorOptions.getSourceDir());
+        assertEquals("accessid", integratorOptions.getAwsAccessKeyId());
+        assertEquals("secretkey", integratorOptions.getAwsSecretKey());
+        assertEquals("testbucket", integratorOptions.getBucketName());
+
+        DeriverOptions deriverOptions = options.getDeriverOptions();
+        assertFalse(deriverOptions.isEnabled());
+        assertEquals("test/data/output", deriverOptions.getSourceDir());
+        assertEquals(1, deriverOptions.getTransformationOptions().size());
+
+        TransformationOption transformationOption = deriverOptions.getTransformationOptions().get(0);
+        assertEquals("First Transformation", transformationOption.getName());
+
+        assertEquals("testSourceLib", transformationOption.getTransformationSourceLib());
+        assertEquals("YTDCumulative", transformationOption.getTransformation());
+        assertEquals("testTransformationFolder", transformationOption.getFolder());
+        assertEquals("PRCP", transformationOption.getFile());
+        assertEquals("testNormalDir", transformationOption.getNormalDir());
+        assertTrue(0 == transformationOption.getDateIndex());
+        assertTrue(1 == transformationOption.getDataIndex());
+        assertEquals("PRCP_YTD", transformationOption.getOutName());
     }
 }

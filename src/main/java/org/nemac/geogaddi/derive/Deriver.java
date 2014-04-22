@@ -1,39 +1,33 @@
 package org.nemac.geogaddi.derive;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-
 import org.nemac.geogaddi.derive.transformation.AbstractTransformation;
 import org.nemac.geogaddi.derive.transformation.TransformationFactory;
 import org.nemac.geogaddi.derive.transformation.TransformationType;
-import org.nemac.geogaddi.model.TransformationOptions;
+import org.nemac.geogaddi.model.TransformationOption;
 import org.nemac.geogaddi.write.Utils;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.*;
 
 public class Deriver {
     
     private static final String lineFormat = "%s,%s";
     private static final String pathFormat = "%s/%s.%s";
     
-    public static Map<String, Map<String, Set<String>>> derive(String sourceDir, TransformationOptions transformationOptions, boolean uncompress) throws IOException, ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public static Map<String, Map<String, Set<String>>> derive(String sourceDir, TransformationOption transformationOption, boolean uncompress) throws IOException, ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         Map<String, Map<String, Set<String>>> derivedMap = new TreeMap<>();
         
         AbstractTransformation transformation;
         
-        if (transformationOptions.getTransformationSourceLib().isEmpty()) {
-            transformation = TransformationFactory.createTransformation(TransformationType.fromType(transformationOptions.getTransformation()));
+        if (transformationOption.getTransformationSourceLib().isEmpty()) {
+            transformation = TransformationFactory.createTransformation(TransformationType.fromType(transformationOption.getTransformation()));
         } else {
             // TODO: find the transformation with the reflection factory
-            transformation = TransformationFactory.createTransformation(transformationOptions.getTransformation());
+            transformation = TransformationFactory.createTransformation(transformationOption.getTransformation());
         }
 
         String[] extensions;
@@ -50,7 +44,7 @@ public class Deriver {
         
         while (files.hasNext()) {
             File file = files.next();
-            if (file.getName().substring(0, file.getName().indexOf(".")).equals(transformationOptions.getFile())) {
+            if (file.getName().substring(0, file.getName().indexOf(".")).equals(transformationOption.getFile())) {
                 
                 File useFile = file;
                 if (!uncompress) {
@@ -60,14 +54,14 @@ public class Deriver {
                 String folder = FilenameUtils.getBaseName(useFile.getParent());
                 SortedMap<String, Float> dataPairs = linesToMap(FileUtils.readLines(useFile));
                 
-                File normalFile = getNormalFile(transformationOptions.getNormalDir(), folder, extensions[0]);
+                File normalFile = getNormalFile(transformationOption.getNormalDir(), folder, extensions[0]);
                 
                 if (normalFile.exists()) { // only use if there is a corresponding normal
                     SortedMap<String, Float> normalPairs = linesToMap(FileUtils.readLines(normalFile));
                     SortedMap<String, Float> processedPairs = transformation.process(dataPairs, normalPairs);
                     
                     Map<String, Set<String>> subMap = new TreeMap<>();
-                    subMap.put(transformationOptions.getOutName(),mapToLines(processedPairs));
+                    subMap.put(transformationOption.getOutName(),mapToLines(processedPairs));
                     derivedMap.put(folder, subMap);
                 }
                 
