@@ -1,4 +1,4 @@
-package org.nemac.geogaddi.model;
+package org.nemac.geogaddi.options;
 
 import java.util.ArrayList;
 import java.util.List;

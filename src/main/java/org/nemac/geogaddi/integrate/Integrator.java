@@ -10,22 +10,20 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.ObjectMetadataProvider;
 import com.amazonaws.services.s3.transfer.TransferManager;
-import org.nemac.geogaddi.model.GeogaddiOptions;
-import org.nemac.geogaddi.model.IntegratorOptions;
+import org.nemac.geogaddi.GeogaddiOptionDriver;
+import org.nemac.geogaddi.options.IntegratorOptions;
 
 import java.io.File;
 
-public class Integrator {
-    private static final IntegratorOptions INTEGRATOR_OPTIONS = GeogaddiOptions.getIntegratorOptions();
-    private static final boolean isUncompress = GeogaddiOptions.isUncompress();
-    private static final boolean isQuiet = GeogaddiOptions.isQuiet();
-    
+public class Integrator extends GeogaddiOptionDriver {
+    private static final IntegratorOptions INTEGRATOR_OPTIONS = geogaddiOptions.getIntegratorOptions();
+
     public static void integrate(boolean clean) throws AmazonClientException, InterruptedException  {
         BasicAWSCredentials credentials = new BasicAWSCredentials(INTEGRATOR_OPTIONS.getAwsAccessKeyId(), INTEGRATOR_OPTIONS.getAwsSecretKey());
 
         String bucketName = INTEGRATOR_OPTIONS.getBucketName();
 
-        if (!isQuiet) System.out.println("Transferring content to S3");
+        if (!geogaddiOptions.isQuiet()) System.out.println("Transferring content to S3");
 
         AmazonS3 s3 = new AmazonS3Client(credentials);
         s3.setRegion(Region.getRegion(Regions.US_EAST_1)); // TODO: parameterize?
@@ -35,14 +33,14 @@ public class Integrator {
         }
 
         if (clean) {
-            BucketDestroy.emptyBucket(s3, bucketName, isQuiet);
+            BucketDestroy.emptyBucket(s3, bucketName, geogaddiOptions.isQuiet());
         }
 
         TransferManager transfer = new TransferManager(s3);
         
         MultipleFileUpload upload;
         String sourceDir = INTEGRATOR_OPTIONS.getSourceDir();
-        if (isUncompress) {
+        if (geogaddiOptions.isUncompress()) {
             upload  = transfer.uploadDirectory(bucketName, null, new File(sourceDir), true);
         } else {
             ObjectMetadataProvider metadataProvider = new ObjectMetadataProvider() {
@@ -59,12 +57,12 @@ public class Integrator {
             upload = transfer.uploadDirectory(bucketName, null, new File(sourceDir), true, metadataProvider);
         }
         
-        if (!isQuiet) upload.addProgressListener(new IntegratorProgressListener());
+        if (!geogaddiOptions.isQuiet()) upload.addProgressListener(new IntegratorProgressListener());
         
         upload.waitForCompletion();
         
         transfer.shutdownNow();
 
-        if (!isQuiet) System.out.println("... content transferred to S3");
+        if (!geogaddiOptions.isQuiet()) System.out.println("... content transferred to S3");
     }
 }

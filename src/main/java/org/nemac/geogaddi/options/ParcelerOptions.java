@@ -1,12 +1,12 @@
-package org.nemac.geogaddi.model;
+package org.nemac.geogaddi.options;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ParcelerOptions {
     private Boolean enabled = true;
-    private Boolean uncompress = false;
-    private Boolean cleanSource = false;
+    private Boolean uncompress = true;
+    private Boolean cleanSource = true;
     private Boolean cleanDestination = true;
     private Boolean existingFromIntegrator = true;
 //    private String whitelistFileSource;
@@ -17,7 +17,7 @@ public class ParcelerOptions {
     private String fileWhiteList;
     private Integer fileWhiteListIndex = 2;
     private Integer fileIndex = 2;
-    private List<Integer> dataIndexes; // = Arrays.asList(1, 3);
+    private List<Integer> dataIndexes;
     private String outputDir = "data/output";
 
     public Boolean isEnabled() {

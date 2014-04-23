@@ -2,8 +2,8 @@ package org.nemac.geogaddi.parcel;
 
 import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.lang3.StringUtils;
-import org.nemac.geogaddi.model.GeogaddiOptions;
-import org.nemac.geogaddi.model.ParcelerOptions;
+import org.nemac.geogaddi.GeogaddiOptionDriver;
+import org.nemac.geogaddi.options.ParcelerOptions;
 
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -12,11 +12,8 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-public final class Parceler {
-    private static final ParcelerOptions parcelerOptions = GeogaddiOptions.getParcelerOptions();
-    private static final boolean isUncompress = GeogaddiOptions.isUncompress();
-    private static final boolean isQuiet = GeogaddiOptions.isQuiet();
-    
+public final class Parceler extends GeogaddiOptionDriver {
+    private static final ParcelerOptions parcelerOptions = geogaddiOptions.getParcelerOptions();
 
     public static Map<String, Map<String, Set<String>>> parcel(String csvSource) throws IOException {
         Set<String> folderWhiteList = buildWhitelist(parcelerOptions.getFolderWhiteList());
@@ -26,11 +23,11 @@ public final class Parceler {
     }
 
     private static Set<String> buildWhitelist(String whiteListSource) throws IOException {
-        if (!isQuiet) System.out.println("Building whitelist ");
+        if (!geogaddiOptions.isQuiet()) System.out.println("Building whitelist ");
         Set<String> whiteList = new HashSet<String>();
 
         if (whiteListSource != null && !whiteListSource.isEmpty()) {
-            if (!isQuiet) System.out.print("from " + whiteListSource);
+            if (!geogaddiOptions.isQuiet()) System.out.print("from " + whiteListSource);
             CSVReader whiteListReader = new CSVReader(new FileReader(whiteListSource));
             String[] nextLine;
             while ((nextLine = whiteListReader.readNext()) != null) {
@@ -39,9 +36,9 @@ public final class Parceler {
 
             whiteListReader.close();
 
-            if (!isQuiet) System.out.println("... whitelist built with " + whiteList.size() + " items");
+            if (!geogaddiOptions.isQuiet()) System.out.println("... whitelist built with " + whiteList.size() + " items");
         } else {
-            if (!isQuiet) System.out.println("... whitelist not found, no filtering will be perfomred");
+            if (!geogaddiOptions.isQuiet()) System.out.println("... whitelist not found, no filtering will be perfomred");
         }
 
         return whiteList;
@@ -55,11 +52,11 @@ public final class Parceler {
         //    String -> File
         //    Set   -> Row data
 
-        if (!isQuiet) System.out.println("Hashing " + csvSource);
+        if (!geogaddiOptions.isQuiet()) System.out.println("Hashing " + csvSource);
         Map<String, Map<String, Set<String>>> folderHash = new TreeMap<String, Map<String, Set<String>>>();
 
         CSVReader dataReader;
-        if (parcelerOptions.isUncompress()) {
+        if (!parcelerOptions.isUncompress()) {
             dataReader = new CSVReader(new FileReader(csvSource));
         } else {
             GZIPInputStream in = new GZIPInputStream(new FileInputStream(csvSource));
@@ -104,7 +101,7 @@ public final class Parceler {
 
         dataReader.close();
 
-        if (!isQuiet) System.out.println("... CSV file hashed");
+        if (!geogaddiOptions.isQuiet()) System.out.println("... CSV file hashed");
         return folderHash;
     }
 

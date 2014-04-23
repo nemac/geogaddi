@@ -1,5 +1,5 @@
 {
-    "quiet": false,
+    "quiet": true,
     "useAll": true,
     "uncompress": true,
     "fetcherOptions": {
@@ -39,9 +39,9 @@
         "bucketName": "testbucket"
     },
     "deriverOptions": {
-        "enabled": false,
+        "enabled": true,
         "sourceDir": "test/data/output",
-        "transformations": [
+        "transformationOptions": [
             {
                 "name": "First Transformation",
                 "transformationSourceLib": "testSourceLib",
@@ -55,7 +55,7 @@
             },
             {
                 "name": "Second Transformation",
-                "transformationSourceLib": "path/to/lib",
+                "transformationSourceLib": "C:/full/path/to/lib.jar",
                 "transformation": "com.foo.TransformationClass",
                 "folder": "",
                 "file": "",

@@ -9,7 +9,7 @@ import java.util.TreeMap;
 public class YTDCumulative extends AbstractTransformation {
     
     @Override
-    protected SortedMap<String, Float> transform(final SortedMap<String, Float> values) throws ParseException {
+    public SortedMap<String, Float> transform(final SortedMap<String, Float> values) throws ParseException {
         SortedMap<String, Float> transformedMap = new TreeMap<>();
         Float runningCumulative = 0f;
         Calendar date = Calendar.getInstance();
@@ -30,7 +30,7 @@ public class YTDCumulative extends AbstractTransformation {
     
     // the normals for YTD cumulative are themselves cumulatives, so we need to de-cumulative
     @Override
-    protected SortedMap<String, Float> transformNormals(final SortedMap<String, Float> values) {
+    public SortedMap<String, Float> transformNormals(final SortedMap<String, Float> values) {
         SortedMap<String, Float> transformedMap = new TreeMap<>();
         Float lastValue = 0f;
         

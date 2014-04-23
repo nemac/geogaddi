@@ -2,7 +2,7 @@ package org.nemac.geogaddi.derive.transformation;
 
 public enum TransformationType {
     
-    YTDCumulative("YTD_CUMULATIVE");
+    YTDCumulative("YTDCumulative");
     
     private final String type;
     
@@ -20,8 +20,9 @@ public enum TransformationType {
                 return transformerType;
             }
         }
-        
-        return getDefault();
+
+        // make this null so the factory can try loading a Transformation from the classpath
+        return null;
     }
     
     public static TransformationType getDefault() {

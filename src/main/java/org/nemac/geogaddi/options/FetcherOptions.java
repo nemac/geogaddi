@@ -1,13 +1,13 @@
-package org.nemac.geogaddi.model;
+package org.nemac.geogaddi.options;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FetcherOptions {
-    private Boolean enabled;
-    private Boolean uncompress;
+    private Boolean enabled = true;
+    private Boolean uncompress = true;
     private List<String> sources;
-    private String dumpDir;
+    private String dumpDir = "data/dump";
 
     public Boolean isEnabled() {
         return enabled;

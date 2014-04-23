@@ -1,7 +1,7 @@
 package org.nemac.geogaddi.config;
 
 import org.nemac.geogaddi.exception.PropertiesParseException;
-import org.nemac.geogaddi.model.GeogaddiOptions;
+import org.nemac.geogaddi.options.GeogaddiOptions;
 
 public class GeogaddiOptionsFactory {
 
@@ -9,7 +9,7 @@ public class GeogaddiOptionsFactory {
         //
     }
 
-    public static GeogaddiOptions instanceOf(final PropertyManagerTypeEnum managerType, final String propertiesSource) throws PropertiesParseException {
+    public static GeogaddiOptions instanceOf(final PropertyTypes managerType, final String propertiesSource) throws PropertiesParseException {
         switch (managerType) {
             case JSON_PROPS:
                 return new JSONPropertiesDeserializer(propertiesSource).deserialize();

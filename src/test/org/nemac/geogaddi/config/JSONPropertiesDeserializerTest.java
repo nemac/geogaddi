@@ -2,14 +2,15 @@ package org.nemac.geogaddi.config;
 
 import org.junit.Test;
 import org.nemac.geogaddi.exception.PropertiesParseException;
-import org.nemac.geogaddi.model.*;
+import org.nemac.geogaddi.options.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JSONPropertiesDeserializerTest {
 
@@ -19,7 +20,7 @@ public class JSONPropertiesDeserializerTest {
         String testProps = Paths.get(resource.toURI()).toString();
 
         GeogaddiOptions options = new JSONPropertiesDeserializer(testProps).deserialize();
-        assertFalse(options.isQuiet());
+        assertTrue(options.isQuiet());
         assertTrue(options.isUseAll());
         assertTrue(options.isUncompress());
 
@@ -58,7 +59,7 @@ public class JSONPropertiesDeserializerTest {
         assertEquals("testbucket", integratorOptions.getBucketName());
 
         DeriverOptions deriverOptions = options.getDeriverOptions();
-        assertFalse(deriverOptions.isEnabled());
+        assertTrue(deriverOptions.isEnabled());
         assertEquals("test/data/output", deriverOptions.getSourceDir());
         assertEquals(2, deriverOptions.getTransformationOptions().size());
 

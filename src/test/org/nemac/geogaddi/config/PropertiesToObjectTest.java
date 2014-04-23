@@ -1,10 +1,9 @@
 package org.nemac.geogaddi.config;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.junit.Before;
 import org.junit.Test;
 import org.nemac.geogaddi.exception.PropertiesParseException;
-import org.nemac.geogaddi.model.*;
+import org.nemac.geogaddi.options.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -15,10 +14,6 @@ import java.nio.file.Paths;
 import static org.junit.Assert.*;
 
 public class PropertiesToObjectTest {
-
-    @Before
-    public void setUp() throws Exception {
-    }
 
     @Test
     public void testReadFile() throws URISyntaxException, IllegalAccessException, ConfigurationException, IOException, InstantiationException, NoSuchMethodException, InvocationTargetException, ClassNotFoundException, NoSuchFieldException, PropertiesParseException {
@@ -67,7 +62,7 @@ public class PropertiesToObjectTest {
         assertEquals("testbucket", integratorOptions.getBucketName());
 
         DeriverOptions deriverOptions = options.getDeriverOptions();
-        assertFalse(deriverOptions.isEnabled());
+        assertTrue(deriverOptions.isEnabled());
         assertEquals("test/data/output", deriverOptions.getSourceDir());
         assertEquals(1, deriverOptions.getTransformationOptions().size());
 

@@ -3,13 +3,13 @@ package org.nemac.geogaddi;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.nemac.geogaddi.config.GeogaddiOptionsFactory;
-import org.nemac.geogaddi.config.PropertyManagerTypeEnum;
+import org.nemac.geogaddi.config.PropertyTypes;
 import org.nemac.geogaddi.derive.Deriver;
 import org.nemac.geogaddi.exception.PropertiesParseException;
+import org.nemac.geogaddi.exception.TransformationNotFoundException;
 import org.nemac.geogaddi.fetch.Fetcher;
 import org.nemac.geogaddi.integrate.Integrator;
-import org.nemac.geogaddi.model.GeogaddiOptions;
-import org.nemac.geogaddi.model.TransformationOption;
+import org.nemac.geogaddi.options.TransformationOption;
 import org.nemac.geogaddi.parcel.Parceler;
 import org.nemac.geogaddi.parcel.summary.Summarizer;
 import org.nemac.geogaddi.write.Writer;
@@ -23,12 +23,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Geogaddi {
-
-//    private static PropertiesManager props;
+public class Geogaddi extends GeogaddiOptionDriver {
 
     // command-line util
-    public static void main(String args[]) throws InterruptedException, java.text.ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException, PropertiesParseException {
+    public static void main(String args[]) throws InterruptedException, java.text.ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException, PropertiesParseException, TransformationNotFoundException {
         long start = System.currentTimeMillis();
 
         // command-line args
@@ -48,24 +46,24 @@ public class Geogaddi {
         try {
             CommandLine cmd = parser.parse(options, args);
 
-            PropertyManagerTypeEnum managerType;
+            PropertyTypes managerType;
             if (cmd.hasOption("p")) {
-                managerType = PropertyManagerTypeEnum.JAVA_PROPS;
+                managerType = PropertyTypes.JAVA_PROPS;
             } else if (cmd.hasOption("j")) {
-                managerType = PropertyManagerTypeEnum.JSON_PROPS;
+                managerType = PropertyTypes.JSON_PROPS;
             } else {
                 throw new MissingArgumentException("Must specify the properties file type with the \"p\" or \"j\" argument.");
             }
 
             // get PropertiesManager for JSON_PROPS or Simple types
             String propertiesSource = cmd.getOptionValue(managerType.getArgValue());
-            GeogaddiOptions geogaddiOptions = GeogaddiOptionsFactory.instanceOf(managerType, propertiesSource);
+            geogaddiOptions = GeogaddiOptionsFactory.instanceOf(managerType, propertiesSource);
 
             boolean allEnabled = geogaddiOptions.isUseAll();
             boolean fetchEnabled = geogaddiOptions.getFetcherOptions().isEnabled();
             boolean parcelEnabled = geogaddiOptions.getParcelerOptions().isEnabled();
             boolean integrateEnabled = geogaddiOptions.getIntegratorOptions().isEnabled();
-            boolean deriverEnabled = geogaddiOptions.getDeriverOptions().isEnabled() && cmd.hasOption("j");
+            boolean deriverEnabled = geogaddiOptions.getDeriverOptions().isEnabled();
 
 
             boolean cleanFetcherSource = geogaddiOptions.getParcelerOptions().isCleanSource();
@@ -117,7 +115,7 @@ public class Geogaddi {
                 }
             }
 
-            if ((allEnabled && cmd.hasOption("j")) || deriverEnabled) {
+            if (allEnabled || deriverEnabled) {
                 for (TransformationOption transformation : geogaddiOptions.getDeriverOptions().getTransformationOptions()) {
                     Map<String, Map<String, Set<String>>> derived = Deriver.derive(transformation);
                     Writer.write(derived, summarizer, destDirPath);

@@ -2,12 +2,12 @@ package org.nemac.geogaddi.derive;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.nemac.geogaddi.derive.transformation.AbstractTransformation;
+import org.nemac.geogaddi.GeogaddiOptionDriver;
+import org.nemac.geogaddi.derive.transformation.Transformation;
 import org.nemac.geogaddi.derive.transformation.TransformationFactory;
-import org.nemac.geogaddi.derive.transformation.TransformationType;
-import org.nemac.geogaddi.model.DeriverOptions;
-import org.nemac.geogaddi.model.GeogaddiOptions;
-import org.nemac.geogaddi.model.TransformationOption;
+import org.nemac.geogaddi.exception.TransformationNotFoundException;
+import org.nemac.geogaddi.options.DeriverOptions;
+import org.nemac.geogaddi.options.TransformationOption;
 import org.nemac.geogaddi.write.Utils;
 
 import java.io.File;
@@ -15,27 +15,25 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
-public class Deriver {
+public class Deriver extends GeogaddiOptionDriver {
     private static final String LINE_FORMAT = "%s,%s";
     private static final String PATH_FORMAT = "%s/%s.%s";
-    private static final DeriverOptions DERIVER_OPTIONS = GeogaddiOptions.getDeriverOptions();
-    private static final boolean isUncompress = GeogaddiOptions.isUncompress();
-    
-    public static Map<String, Map<String, Set<String>>> derive(TransformationOption transformationOption) throws IOException, ParseException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    private static final DeriverOptions DERIVER_OPTIONS = geogaddiOptions.getDeriverOptions();
+
+    public static Map<String, Map<String, Set<String>>> derive(TransformationOption transformationOption) throws TransformationNotFoundException, IOException, ParseException {
         Map<String, Map<String, Set<String>>> derivedMap = new TreeMap<>();
         
-        AbstractTransformation transformation;
+        Transformation transformation;
         
-        if (transformationOption.getTransformationSourceLib().isEmpty()) {
-            transformation = TransformationFactory.createTransformation(TransformationType.fromType(transformationOption.getTransformation()));
-        } else {
-            // TODO: find the transformation with the reflection factory
-            transformation = TransformationFactory.createTransformation(transformationOption.getTransformation());
-        }
+//        if (transformationOption.getTransformationSourceLib().isEmpty()) {
+//            transformation = TransformationFactory.createTransformation(TransformationType.fromType(transformationOption.getTransformation()));
+//        } else {
+            transformation = TransformationFactory.createTransformation(transformationOption.getTransformationSourceLib(), transformationOption.getTransformation());
+//        }
 
         String[] extensions;
         
-        if (isUncompress) {
+        if (geogaddiOptions.isUncompress()) {
             String[] unExt = {"csv"};
             extensions = unExt;
         } else {
@@ -50,7 +48,7 @@ public class Deriver {
             if (file.getName().substring(0, file.getName().indexOf(".")).equals(transformationOption.getFile())) {
                 
                 File useFile = file;
-                if (!isUncompress) {
+                if (!geogaddiOptions.isUncompress()) {
                     useFile = new File(Utils.uncompress(file.getCanonicalPath(), false));
                 }
                 
@@ -68,7 +66,7 @@ public class Deriver {
                     derivedMap.put(folder, subMap);
                 }
                 
-                if (!isUncompress) {
+                if (!geogaddiOptions.isUncompress()) {
                     FileUtils.deleteQuietly(useFile);
                 }
             }

@@ -6,14 +6,15 @@ import java.util.Calendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public abstract class AbstractTransformation {
+public abstract class AbstractTransformation implements Transformation {
     
     protected final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         
     public AbstractTransformation() {
         //
     }
-    
+
+    @Override
     public SortedMap<String, Float> process(final SortedMap<String, Float> values, final SortedMap<String, Float> defaults) throws ParseException {
         return transform(fillGapsWithNormals(values, transformNormals(defaults)));
     }
@@ -59,13 +60,5 @@ public abstract class AbstractTransformation {
         }
         
         return filledMap;
-    }
-    
-    protected SortedMap<String, Float> transform(final SortedMap<String, Float> values) throws ParseException {       
-        return values;
-    }
-    
-    protected SortedMap<String, Float> transformNormals(final SortedMap<String, Float> values) {
-        return values;
     }
 }

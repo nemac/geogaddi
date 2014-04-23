@@ -4,7 +4,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.nemac.geogaddi.exception.PropertiesParseException;
-import org.nemac.geogaddi.model.GeogaddiOptions;
+import org.nemac.geogaddi.options.GeogaddiOptions;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.*;
@@ -14,9 +14,8 @@ import java.util.List;
 
 public class PropertiesToObject {
     private static final String DEFAULT_PROPERTIES_PATH = "geogaddi.properties";
-    private static final String PROPERTIES_PACKAGE = "org.nemac.geogaddi.model";
 
-    final String propertiesSource;
+    private final String propertiesSource;
 
     public PropertiesToObject(String propertiesSource) {
         this.propertiesSource = propertiesSource == null ? DEFAULT_PROPERTIES_PATH : propertiesSource;
@@ -24,7 +23,7 @@ public class PropertiesToObject {
 
     public GeogaddiOptions deserialize() throws PropertiesParseException {
         Configuration config = null;
-        GeogaddiOptions geogaddiOptions = GeogaddiOptions.getInstance();
+        GeogaddiOptions geogaddiOptions = new GeogaddiOptions();
 
         try {
             config = new PropertiesConfiguration(propertiesSource);
@@ -44,7 +43,7 @@ public class PropertiesToObject {
             Iterator<String> deriverOptionKeys = config.getKeys("deriverOptions");
             parseAndSetOptionsFor(config, geogaddiOptions.getDeriverOptions(), deriverOptionKeys);
 
-            // TODO: implement more than one transformation for java-style properties
+            // TODO: implement more than one transformation for java-style properties?
             if (!geogaddiOptions.getDeriverOptions().getTransformationOptions().isEmpty()) {
                 Iterator<String> transformationOptionKeys = config.getKeys("deriverOptions.transformationOptions");
                 parseAndSetOptionsFor(config, geogaddiOptions.getDeriverOptions().getTransformationOptions().get(0), transformationOptionKeys);

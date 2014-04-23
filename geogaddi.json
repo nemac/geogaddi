@@ -1,22 +1,23 @@
 {
-    "quiet": false,
-    "useAll": false,
+    "quiet": true,
+    "useAll": true,
     "uncompress": true,
-    "fetcher": {
-        "enabled": false,
-        "uncompress": false,
-        "source": [
+    "fetcherOptions": {
+        "enabled": true,
+        "uncompress": true,
+        "sources": [
             "ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1900.csv.gz",
             "ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1901.csv.gz"
         ],
-        "dumpDir": "data/dump"
+        "dumpDir": "test/data/dump"
     },
-    "parceler": {
-        "enabled": false,
-        "cleanSource": false,
+    "parcelerOptions": {
+        "enabled": true,
+        "uncompress": true,
+        "cleanSource": true,
         "cleanDestination": true,
         "existingFromIntegrator": true,
-        "sourceCsv": [
+        "sourceCSVs": [
             "data/dump/1900.csv.gz",
             "data/dump/1901.csv.gz"
         ],
@@ -26,36 +27,47 @@
         "fileWhiteList": "vars.csv",
         "fileWhiteListIndex": 2,
         "fileIndex": 2,
-        "dataIndex": [1,3],
+        "dataIndexes": [1,3],
         "outputDir": "data/output"
     },
-    "integrator": {
-        "enabled": false,
-        "cleanSource":false,
+    "integratorOptions": {
+        "enabled": true,
+        "cleanSource":true,
         "sourceDir": "data/output",
         "awsAccessKeyId": "",
         "awsSecretKey": "",
         "bucketName": ""
     },
-    "deriver": {
+    "deriverOptions": {
         "enabled": true,
-        "sourceDir": "data/output",
-        "transformations": [
+        "sourceDir": "test/data/output",
+        "transformationOptions": [
             {
-                "name": "First Transformation",
-                "transformationSourceLib": "",
+                "name": "First Transformation registered",
+                "transformationSourceLib": "testSourceLib",
                 "transformation": "YTDCumulative",
-                "folder": "",
+                "folder": "transformationFolder",
                 "file": "PRCP",
-                "normalDir": "data/GHCND_NORMALS/NORMAL_YTD_PRCP",
+                "normalDir": "normalDir",
                 "dateIndex": 0,
                 "dataIndex": 1,
                 "outName": "PRCP_YTD"
             },
             {
-                "name": "Second Transformation",
-                "transformationSourceLib": "path/to/lib",
-                "transformation": "com.foo.TransformationClass",
+                "name": "Second Transformation in some directory",
+                "transformationSourceLib": "C:/full/path/to/lib.jar",
+                "transformation": "com.foo.TransformationClass2",
+                "folder": "",
+                "file": "",
+                "normalDir": "",
+                "dateIndex": 0,
+                "dataIndex": 1,
+                "outName": "PRCP_YTD"
+            },
+            {
+                "name": "Thrid Transformation on classpath",
+                "transformationSourceLib": "",
+                "transformation": "com.foo.TransformationClass3",
                 "folder": "",
                 "file": "",
                 "normalDir": "",
