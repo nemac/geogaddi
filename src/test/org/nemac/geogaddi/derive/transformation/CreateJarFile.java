@@ -10,7 +10,7 @@ import java.util.jar.Manifest;
 
 public class CreateJarFile {
     public static File buildJar(File dir) throws IOException {
-        File result = File.createTempFile("brooklyn-built", ".jar");
+        File result = File.createTempFile("geogaddi-test", ".jar");
         System.out.println(result.getAbsolutePath());
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
