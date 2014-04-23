@@ -23,13 +23,7 @@ public class Deriver extends GeogaddiOptionDriver {
     public static Map<String, Map<String, Set<String>>> derive(TransformationOption transformationOption) throws TransformationNotFoundException, IOException, ParseException {
         Map<String, Map<String, Set<String>>> derivedMap = new TreeMap<>();
         
-        Transformation transformation;
-        
-//        if (transformationOption.getTransformationSourceLib().isEmpty()) {
-//            transformation = TransformationFactory.createTransformation(TransformationType.fromType(transformationOption.getTransformation()));
-//        } else {
-            transformation = TransformationFactory.createTransformation(transformationOption.getTransformationSourceLib(), transformationOption.getTransformation());
-//        }
+        Transformation transformation = TransformationFactory.createTransformation(transformationOption.getTransformationSourceLib(), transformationOption.getTransformation());
 
         String[] extensions;
         
