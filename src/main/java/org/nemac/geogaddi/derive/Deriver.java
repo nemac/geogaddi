@@ -39,19 +39,24 @@ public class Deriver extends GeogaddiOptionDriver {
         
         while (files.hasNext()) {
             File file = files.next();
-            if (file.getName().substring(0, file.getName().indexOf(".")).equals(transformationOption.getFile())) {
-                
+            
+            if (Utils.removeExtension(file.getName()).equals(transformationOption.getFile())) {
+                                
                 File useFile = file;
-                if (!geogaddiOptions.isUncompress()) {
+                if (!geogaddiOptions.isUncompress()) { // is working with compressed files, so uncompress temporarily
                     useFile = new File(Utils.uncompress(file.getCanonicalPath(), false));
                 }
+                
+                System.out.println("Usefile" + useFile.getName());
                 
                 String folder = FilenameUtils.getBaseName(useFile.getParent());
                 SortedMap<String, Float> dataPairs = linesToMap(FileUtils.readLines(useFile));
                 
+                System.out.println("Last key: " + dataPairs.lastKey());
+                
                 File normalFile = getNormalFile(transformationOption.getNormalDir(), folder, extensions[0]);
                 
-                if (normalFile.exists()) { // only use if there is a corresponding normal
+                if (normalFile.exists()) { // only use if there is a corresponding normal                    
                     SortedMap<String, Float> normalPairs = linesToMap(FileUtils.readLines(normalFile));
                     SortedMap<String, Float> processedPairs = transformation.process(dataPairs, normalPairs);
                     

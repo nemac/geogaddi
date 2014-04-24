@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import org.apache.commons.io.FilenameUtils;
 
 public class Utils {
     private static final String COMPRESSION_EXTENSION = ".gz";
@@ -90,6 +91,16 @@ public class Utils {
             return directoryString.substring(0, directoryString.length() - 1);
         } else {
             return directoryString;
+        }
+    }
+    
+    public static String removeExtension(String filename) {
+        String clean = FilenameUtils.removeExtension(filename);
+        
+        if (clean.equals(filename)) {
+            return clean;
+        } else {
+            return removeExtension(clean);
         }
     }
 }

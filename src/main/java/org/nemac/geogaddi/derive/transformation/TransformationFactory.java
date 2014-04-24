@@ -39,7 +39,7 @@ public class TransformationFactory {
             // now try the Geogaddi registered Transformations
             TransformationType transformationType = TransformationType.fromType(transformationName);
             transformation = transformationFromType(transformationType);
-
+            
             // now check the class path
             if (transformation == null) {
                 try {
