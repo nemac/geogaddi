@@ -4,7 +4,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.nemac.geogaddi.exception.PropertiesParseException;
-import org.nemac.geogaddi.options.GeogaddiOptions;
+import org.nemac.geogaddi.config.options.GeogaddiOptions;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.*;

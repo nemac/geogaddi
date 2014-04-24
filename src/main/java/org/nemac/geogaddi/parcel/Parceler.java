@@ -3,7 +3,7 @@ package org.nemac.geogaddi.parcel;
 import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.lang3.StringUtils;
 import org.nemac.geogaddi.GeogaddiOptionDriver;
-import org.nemac.geogaddi.options.ParcelerOptions;
+import org.nemac.geogaddi.config.options.ParcelerOptions;
 
 import java.io.FileInputStream;
 import java.io.FileReader;

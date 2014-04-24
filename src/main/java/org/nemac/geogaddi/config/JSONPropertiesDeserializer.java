@@ -3,7 +3,7 @@ package org.nemac.geogaddi.config;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.nemac.geogaddi.exception.PropertiesParseException;
-import org.nemac.geogaddi.options.GeogaddiOptions;
+import org.nemac.geogaddi.config.options.GeogaddiOptions;
 
 import java.io.File;
 

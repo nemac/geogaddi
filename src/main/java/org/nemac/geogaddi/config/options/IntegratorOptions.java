@@ -1,4 +1,4 @@
-package org.nemac.geogaddi.options;
+package org.nemac.geogaddi.config.options;
 
 public class IntegratorOptions {
     private Boolean enabled = false;

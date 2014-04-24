@@ -9,7 +9,7 @@ import org.nemac.geogaddi.exception.PropertiesParseException;
 import org.nemac.geogaddi.exception.TransformationNotFoundException;
 import org.nemac.geogaddi.fetch.Fetcher;
 import org.nemac.geogaddi.integrate.Integrator;
-import org.nemac.geogaddi.options.TransformationOption;
+import org.nemac.geogaddi.config.options.TransformationOption;
 import org.nemac.geogaddi.parcel.Parceler;
 import org.nemac.geogaddi.parcel.summary.Summarizer;
 import org.nemac.geogaddi.write.Writer;

@@ -11,7 +11,7 @@ import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.ObjectMetadataProvider;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import org.nemac.geogaddi.GeogaddiOptionDriver;
-import org.nemac.geogaddi.options.IntegratorOptions;
+import org.nemac.geogaddi.config.options.IntegratorOptions;
 
 import java.io.File;
 

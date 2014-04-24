@@ -1,7 +1,7 @@
 package org.nemac.geogaddi.fetch;
 
 import org.nemac.geogaddi.GeogaddiOptionDriver;
-import org.nemac.geogaddi.options.FetcherOptions;
+import org.nemac.geogaddi.config.options.FetcherOptions;
 import org.nemac.geogaddi.write.Utils;
 
 import java.io.File;

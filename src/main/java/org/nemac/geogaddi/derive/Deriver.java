@@ -6,8 +6,8 @@ import org.nemac.geogaddi.GeogaddiOptionDriver;
 import org.nemac.geogaddi.derive.transformation.Transformation;
 import org.nemac.geogaddi.derive.transformation.TransformationFactory;
 import org.nemac.geogaddi.exception.TransformationNotFoundException;
-import org.nemac.geogaddi.options.DeriverOptions;
-import org.nemac.geogaddi.options.TransformationOption;
+import org.nemac.geogaddi.config.options.DeriverOptions;
+import org.nemac.geogaddi.config.options.TransformationOption;
 import org.nemac.geogaddi.write.Utils;
 
 import java.io.File;
@@ -21,6 +21,7 @@ public class Deriver extends GeogaddiOptionDriver {
     private static final DeriverOptions DERIVER_OPTIONS = geogaddiOptions.getDeriverOptions();
 
     public static Map<String, Map<String, Set<String>>> derive(TransformationOption transformationOption) throws TransformationNotFoundException, IOException, ParseException {
+        if (!geogaddiOptions.isQuiet()) System.out.println("Derived product being generated using " + transformationOption.getName());
         Map<String, Map<String, Set<String>>> derivedMap = new TreeMap<>();
         
         Transformation transformation = TransformationFactory.createTransformation(transformationOption.getTransformationSourceLib(), transformationOption.getTransformation());
@@ -46,27 +47,31 @@ public class Deriver extends GeogaddiOptionDriver {
                 if (!geogaddiOptions.isUncompress()) { // is working with compressed files, so uncompress temporarily
                     useFile = new File(Utils.uncompress(file.getCanonicalPath(), false));
                 }
-                
-                System.out.println("Usefile" + useFile.getName());
-                
+                                
                 String folder = FilenameUtils.getBaseName(useFile.getParent());
                 SortedMap<String, Float> dataPairs = linesToMap(FileUtils.readLines(useFile));
                 
-                System.out.println("Last key: " + dataPairs.lastKey());
-                
                 File normalFile = getNormalFile(transformationOption.getNormalDir(), folder, extensions[0]);
-                
+
                 if (normalFile.exists()) { // only use if there is a corresponding normal                    
+                    if (!geogaddiOptions.isUncompress()) {
+                        normalFile = new File(Utils.uncompress(normalFile.getCanonicalPath(), false));
+                    }
+                    
                     SortedMap<String, Float> normalPairs = linesToMap(FileUtils.readLines(normalFile));
                     SortedMap<String, Float> processedPairs = transformation.process(dataPairs, normalPairs);
                     
                     Map<String, Set<String>> subMap = new TreeMap<>();
                     subMap.put(transformationOption.getOutName(),mapToLines(processedPairs));
                     derivedMap.put(folder, subMap);
+                    
+                } else {
+                    if (!geogaddiOptions.isQuiet()) System.out.println("... normal file " + normalFile.getPath() + " was not found, derived product will not be generated");
                 }
                 
                 if (!geogaddiOptions.isUncompress()) {
                     FileUtils.deleteQuietly(useFile);
+                    FileUtils.deleteQuietly(normalFile);
                 }
             }
         }
@@ -79,6 +84,7 @@ public class Deriver extends GeogaddiOptionDriver {
     // NORMALS: NORMAL_VAR/station.csv
     private static File getNormalFile(String baseDir, String dataFolder, String extension) {
         String path = String.format(PATH_FORMAT, Utils.conformDirectoryString(baseDir), dataFolder, extension);
+        System.out.println(path);
         return new File(path);
     }
     
@@ -87,8 +93,6 @@ public class Deriver extends GeogaddiOptionDriver {
         
         for (String line : lines) {
             String[] pair = line.split(",");
-            
-            // round any non-int numeric input
             map.put(pair[0], Float.parseFloat(pair[1]));
         }
         
@@ -98,6 +102,7 @@ public class Deriver extends GeogaddiOptionDriver {
     private static Set<String> mapToLines(Map<String, Float> map) {
         Set<String> set = new TreeSet<>();
         
+        // round non-integers before writing
         for (Map.Entry<String, Float> entry : map.entrySet()) {
             set.add(String.format(LINE_FORMAT, entry.getKey(), Math.round(entry.getValue())));
         }
