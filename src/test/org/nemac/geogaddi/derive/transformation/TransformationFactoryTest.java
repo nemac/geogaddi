@@ -17,7 +17,7 @@ public class TransformationFactoryTest {
         Path testPath = Paths.get(Thread.currentThread().getContextClassLoader().getResource("").toURI());
         File transformationSourceLib = CreateJarFile.buildJar(testPath.toFile());
 
-        Transformation transformation = TransformationFactory.createTransformation(transformationSourceLib.toURI().toString(), transformationClassName);
+        AbstractTransformation transformation = TransformationFactory.createTransformation(transformationSourceLib.toURI().toString(), transformationClassName);
 
         assertEquals(transformationClassName, transformation.getClass().getName());
 
@@ -28,7 +28,7 @@ public class TransformationFactoryTest {
     public void testCreateTransformationFromClassPath() throws Exception {
         String transformationClassName = "org.nemac.geogaddi.derive.transformation.TransformationStub";
 
-        Transformation transformation = TransformationFactory.createTransformation(transformationClassName);
+        AbstractTransformation transformation = TransformationFactory.createTransformation(transformationClassName);
 
         assertEquals(transformationClassName, transformation.getClass().getName());
     }
@@ -37,7 +37,7 @@ public class TransformationFactoryTest {
     public void testCreateTransformationRegisteredTransformation() throws Exception {
         String transformationName = "YTDCumulative";
 
-        Transformation transformation = TransformationFactory.createTransformation(transformationName);
+        AbstractTransformation transformation = TransformationFactory.createTransformation(transformationName);
 
         assertEquals(transformationName, transformation.getClass().getSimpleName());
     }

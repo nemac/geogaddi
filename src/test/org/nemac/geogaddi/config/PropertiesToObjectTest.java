@@ -3,7 +3,7 @@ package org.nemac.geogaddi.config;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 import org.nemac.geogaddi.exception.PropertiesParseException;
-import org.nemac.geogaddi.options.*;
+import org.nemac.geogaddi.config.options.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -11,7 +11,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class PropertiesToObjectTest {
 

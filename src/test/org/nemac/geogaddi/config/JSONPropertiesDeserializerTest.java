@@ -2,7 +2,7 @@ package org.nemac.geogaddi.config;
 
 import org.junit.Test;
 import org.nemac.geogaddi.exception.PropertiesParseException;
-import org.nemac.geogaddi.options.*;
+import org.nemac.geogaddi.config.options.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

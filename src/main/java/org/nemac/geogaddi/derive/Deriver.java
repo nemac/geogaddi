@@ -3,11 +3,11 @@ package org.nemac.geogaddi.derive;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.nemac.geogaddi.GeogaddiOptionDriver;
-import org.nemac.geogaddi.derive.transformation.Transformation;
-import org.nemac.geogaddi.derive.transformation.TransformationFactory;
-import org.nemac.geogaddi.exception.TransformationNotFoundException;
 import org.nemac.geogaddi.config.options.DeriverOptions;
 import org.nemac.geogaddi.config.options.TransformationOption;
+import org.nemac.geogaddi.derive.transformation.AbstractTransformation;
+import org.nemac.geogaddi.derive.transformation.TransformationFactory;
+import org.nemac.geogaddi.exception.TransformationNotFoundException;
 import org.nemac.geogaddi.write.Utils;
 
 import java.io.File;
@@ -24,7 +24,7 @@ public class Deriver extends GeogaddiOptionDriver {
         if (!geogaddiOptions.isQuiet()) System.out.println("Derived product being generated using " + transformationOption.getName());
         Map<String, Map<String, Set<String>>> derivedMap = new TreeMap<>();
         
-        Transformation transformation = TransformationFactory.createTransformation(transformationOption.getTransformationSourceLib(), transformationOption.getTransformation());
+        AbstractTransformation transformation = TransformationFactory.createTransformation(transformationOption.getTransformationSourceLib(), transformationOption.getTransformation());
 
         String[] extensions;
         
