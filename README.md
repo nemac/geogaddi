@@ -76,7 +76,7 @@ An executable JAR with dependencies will deploy to the target/ directory.
 ###Properties (JSON format)
 ```json
 {
-        "quiet": true, // silence STDOUT status messages
+	"quiet": true, // silence STDOUT status messages
 	"useAll": false, // the operation will perform all steps, overrides individual element booleans
         "uncompress": // all operations will uncompress files, expect uncompressed files from previous steps, and write out uncompressed files
 	"fetcherOptions": {
@@ -135,7 +135,7 @@ An executable JAR with dependencies will deploy to the target/ directory.
 	"integratorOptions": {
 		"enabled": false, // will use the integrator
 		"cleanSource": false, // currently unused,
-                 "sourceDir": "data/output", // directory for output files to be transferred
+		"sourceDir": "data/output", // directory for output files to be transferred
 		"awsAccessKeyId": "", // AWS access Key ID - see notes below
 		"awsSecretKey": "", // AWS secret key - see notes below
 		"bucketName": "" // AWS S3 bucket, will create if it doesn't exist; policies are not applied
