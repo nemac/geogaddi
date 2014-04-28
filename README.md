@@ -73,37 +73,75 @@ mvn install
 
 An executable JAR with dependencies will deploy to the target/ directory.
 
-###Arguments
-| Flag | Parameter                   | Description                                                                           |
-|------|-----------------------------|---------------------------------------------------------------------------------------|
-| -a   |                             | perform both a fetch and transform operation                                          |
-| -f   |                             | perform only the fetch operation                                                      |
-| -t   |                             | perform only the transform operation                                                  |
-| -i   |                             | perform only the integration operation                                                |
-| -c   |                             | clean the output directory before writing to it, will also empty the target S3 bucket |
-| -u   |                             | unzip the fetched file and worked with uncompressed data                              |
-| -p   | path/to/geogaddi.properties | location of Java-formatted properties file                                            |
-| -j   | path/to/geogaddi.json       | location of JSON properties file                                                      |
-
-Note: if the properties are set to override, only the -j or -p flags will be used. The remaining options will be driven from the properties file.
-
-####Examples
-Some example usages: 
-```shell
-java -jar geogaddi.jar -c -a -j geogaddi.json
+###Properties (JSON format)
+```json
+{
+        "quiet": true, // silence STDOUT status messages
+	"useAll": false, // the operation will perform all steps, overrides individual element booleans
+        "uncompress": // all operations will uncompress files, expect uncompressed files from previous steps, and write out uncompressed files
+	"fetcherOptions": {
+		"enabled": true, // will use the fetcher
+		"sources": [
+			// array of URLs of gzipped CSVs to download
+		],
+		"dumpDir": "data/dump" // directory where the fetcher should download the data
+	},
+	"parcelerOptions": {
+		"enabled": true, // will use the parceler,
+		"cleanSource": false, // will delete the parceler source once it is done reading the files
+		"cleanDestination": false, // will clear the output directory before writing
+		"sourceCSVs": [
+			// list of CSVs used for a transform operation, if the fetcher is not used
+		],
+		"folderWhiteList": "stations.csv", // path to list of a whitelist of items for filtering the folder variable, will not filter if not provided
+		"folderWhiteListIndex": 0, // CSV column index to filter with list
+		"folderIndex": 0, // CSV column index for distinct elements that will define the output directory structure
+		"fileWhiteList": "vars.csv", // path to list of a whitelist of items for filtering the file variable, will not filter if not provided
+		"fileWhiteListIndex": 2, // CSV column index to filter with list
+		"fileIndex": 2, // CSV column index for distinct elements that will define the output file structure within the directories above
+		"dataIndexes": [1,3], // array of indices for the output data pattern
+		"outputDir": "data/output" // path to output from the transform operation
+	},
+	"deriverOptions": {
+		"enabled": true, // will use the deriver
+		"sourceDir": "data/output", // directory for data that serves as the derived product basis
+		"transformationOptions": [ // array of multiple transformations to be performed, each will have its own output
+			{
+				"name": "First Transformation registered", // name for logging purposes
+				"transformationSourceLib": "", // path to library, if the transformation logic class is external to Geogaddi
+				"transformation": "YTDCumulative", // class name for the transformation
+				"file": "PRCP", // file pattern to be used for the source data files (will ignore extensions in data product)
+				"normalDir": "data/normals", // path to normals to be used for filling in gaps in transformation, if a normal isn't found, the product is skipped
+				"outName": "PRCP_YTD" // output name pattern; will match the general output extension (csv.gz if compressed, csv if uncompressed)
+			},
+			{
+				"name": "Second Transformation in some directory",
+				"transformationSourceLib": "C:/full/path/to/lib.jar",
+				"transformation": "com.foo.TransformationClass2",
+				"file": "PRCP",
+				"normalDir": "data/normals",
+				"outName": "PRCP_YTD"
+			},
+			{
+				"name": "Thrid Transformation on classpath",
+				"transformationSourceLib": "",
+				"transformation": "com.foo.TransformationClass3",
+				"file": "PRCP",
+				"normalDir": "data/normals",
+				"outName": "PRCP_YTD"
+			}
+		]
+	},
+	"integratorOptions": {
+		"enabled": false, // will use the integrator
+		"cleanSource": false, // currently unused,
+                "sourceDir": "data/output", // directory for output files to be transferred
+		"awsAccessKeyId": "", // AWS access Key ID - see notes below
+		"awsSecretKey": "", // AWS secret key - see notes below
+		"bucketName": "" // AWS S3 bucket, will create if it doesn't exist; policies are not applied
+	}
+}
 ```
-Will clean the output directory, perform fetch, transform, and integrate operations, and will use geogaddi.json to define the properties.
-
-```shell
-java -jar geogaddi.jar -t -p geogaddi.properties
-```
-Will perform a transform operation on the CSVs defined in the Java-format properties file.
-
-```shell
-java -jar geogaddi.jar -j geogaddi.json
-```
-If "override" is set to true in the properties file, this is all that's required from the command-line, and all instructions will be defined in the properties.
-
 
 
 ###Properties (Java format)
@@ -122,45 +160,6 @@ If "override" is set to true in the properties file, this is all that's required
 | integrator.s3.accesskeyid | AWS access Key ID - see notes below |
 | integrator.s3.secretkey | AWS secret key - see notes below |
 | integrator.s3.bucket.name | AWS S3 bucket, will create if it doesn't exist; policies are not applied |
-
-###Properties (JSON format)
-```json
-{
-	"override": true, // the operation will be driven from the properties file, only -j or -p flags are used
-	"useAll": false, // the operation will perform all steps, overrides individual element booleans
-	"fetcher": {
-		"enabled": true, // will use the fetcher
-		"uncompress": false, // if true, will uncompress the fetched file and clean up the downloaded .gz
-		"source": [
-			// array of URLs of gzipped CSVs to download
-		],
-		"dumpDir": "data/dump" // directory where the fetcher should download the data
-	},
-	"parceler": {
-		"enabled": true, // will use the parceler,
-		"uncompress": false, // currently unused
-		"cleanSource": false, // will delete the parceler source once it is done reading the files
-		"cleanDestination": false, // will clear the output directory before writing
-		"existingFromIntegrator": false, // currently unused
-		"sourceCsv": [
-			// list of CSVs used for a transform operation, if the fetcher is not used
-		],
-		"whiteList": "", // path to list of a whitelist of items for filtering
-		"whiteListIndex": 0, // CSV column index to filter with list
-		"folderIndex": 0, // CSV column index for distinct elements that will define the output directory structure
-		"fileIndex": 2, // CSV column index for distinct elements that will define the output file structure within the directories above
-		"dataIndex": [1,3], // array of indices for the output data pattern
-		"outputDir": "data/output" // path to output from the transform operation
-	},
-	"integrator": {
-		"enabled": false, // will use the integrator
-		"cleanSource": false, // currently unused
-		"awsAccessKeyId": "", // AWS access Key ID - see notes below
-		"awsSecretKey": "", // AWS secret key - see notes below
-		"bucketName": "" // AWS S3 bucket, will create if it doesn't exist; policies are not applied
-	}
-}
-```
 
 ####Examples
 Input CSV format
@@ -224,6 +223,60 @@ Whereas this same block in the second example properties would look like:
 
 Therefore, it usually makes the most sense to have date (or something equally meaningful) output in the first column.
 
+###Deriving products
+Geogaddi provides a flexible framework for generating derived products.
+Derived products are generated in the order that they are defined in the deriverOptions.transformationOptions array. 
+There will eventually be an increased number of transformation classes specified within the Geogaddi project, but incorporating them requires the project to be recompiled.
+Those classes may be defined by calling the named transformation in the options, with the transformationSourceLib not specified.
+To provide further flexibility, transformation classes may be specified with a classpath reference or by referencing the path to a JAR that contains the desired transformation class.
+All transformation classes must extend the AbstractTransformation class.
+There are several methods within the derived product generation process flow that may be overridden to specify the desired logic.
+
+####General product flow
+For each transformation defined, a similar series of steps take place to generate new products.
+Normals and the source data are converted to KV maps that are sent to the process method.
+Generally the source data is formatted as follows:
+
+```shell
+STATION/VARIABLE.csv
+-> DATE,VALUE
+-> DATE,VALUE
+-> ...
+```
+
+while the normals are formatted as follows for only one year:
+
+```shell
+VARIABLE/STATION.csv
+-> DATE,VALUE
+-> DATE,VALUE
+-> ...
+```
+
+The normal file describes the expected value for that day of the year.
+As the data often have gaps in the period of record, the normal file is consulted to fill in values.
+If a normal file is not discovered that station is skipped.
+
+####Transformation process flow
+Based on the properties for a desired transformation, a transformation factory provides the logic required to process a product using a codified process flow.
+Therefore, every transformation is expected to extend the AbstractTransformation class.
+Within the process flow, only the necessary methods need to be overridden to perform the logic required.
+
+The process is as follows:
+
+1. transformNormals: simply passes through in the superclass, override to perform some logic on each normal value before it is combined with the source data.
+E.g., for YTD_PRCP, the normals are in 100ths of inches, but the data are in centimeters. 
+Each normal value must thus be multiplied by 25.4 before it is directly comparable to the source data.
+
+2. fillGapsWithNormals: merges the source data with the normal data. 
+Two KV maps enter, one KV map leaves. 
+E.g., the source data has values for 20140101, 20140102, 20140104. It is detected that 20140103 is missing, so the 0103 value is consulted from the normal file and filled into the output map.
+
+3. transform: the merged KV map that has a value for every day in the period of record may then be iterated over and transformed. Again a single KV map is returned.
+
+In the case of the YTDCumulative, the normals must be transformed and the data are iterated over in the transform method to provide a running total. 
+The method fillGapsWithNormals is not overridden because the default behavior is sufficient.
+
 ###Integrating with AWS S3
 Some things to note when integrating with S3.
 
@@ -279,6 +332,7 @@ See [this link](https://docs.aws.amazon.com/AmazonS3/latest/dev/website-hosting-
 
 ## Todo
 ###0.3
+- Improve the deriver to not clobber the summary JSON file if used without the parceler.
 - If needed (i.e., if the current architecture becomes costly), add option to get backlog update source from S3 as opposed to relying on the machine hosting the script to maintain a copy of the output
 	- **CURRENT ARCHITECTURE**
 		1. EBS (or script runner disk) contains:
