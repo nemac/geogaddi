@@ -5,7 +5,6 @@ import java.util.List;
 
 public class FetcherOptions {
     private Boolean enabled = true;
-    private Boolean uncompress = true;
     private List<String> sources;
     private String dumpDir = "data/dump";
 
@@ -15,14 +14,6 @@ public class FetcherOptions {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public Boolean isUncompress() {
-        return uncompress;
-    }
-
-    public void setUncompress(Boolean uncompress) {
-        this.uncompress = uncompress;
     }
 
     public List<String> getSources() {

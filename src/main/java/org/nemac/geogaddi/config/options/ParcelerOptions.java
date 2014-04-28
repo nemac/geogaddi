@@ -8,7 +8,6 @@ public class ParcelerOptions {
     private Boolean uncompress = true;
     private Boolean cleanSource = true;
     private Boolean cleanDestination = true;
-    private Boolean existingFromIntegrator = true;
 //    private String whitelistFileSource;
     private List<String> sourceCSVs;
     private String folderWhiteList = "";
@@ -50,14 +49,6 @@ public class ParcelerOptions {
 
     public void setCleanDestination(Boolean cleanDestination) {
         this.cleanDestination = cleanDestination;
-    }
-
-    public Boolean isExistingFromIntegrator() {
-        return existingFromIntegrator;
-    }
-
-    public void setExistingFromIntegrator(Boolean existingFromIntegrator) {
-        this.existingFromIntegrator = existingFromIntegrator;
     }
 
     public List<String> getSourceCSVs() {

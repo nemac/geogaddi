@@ -26,7 +26,7 @@ public class Integrator extends GeogaddiOptionDriver {
         if (!geogaddiOptions.isQuiet()) System.out.println("Transferring content to S3");
 
         AmazonS3 s3 = new AmazonS3Client(credentials);
-        s3.setRegion(Region.getRegion(Regions.US_EAST_1)); // TODO: parameterize?
+        s3.setRegion(Region.getRegion(Regions.US_EAST_1));
 
         if (!s3.doesBucketExist(bucketName)) {
             s3.createBucket(bucketName);

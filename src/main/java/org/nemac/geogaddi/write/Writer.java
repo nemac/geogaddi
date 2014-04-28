@@ -13,7 +13,6 @@ public class Writer extends GeogaddiOptionDriver {
     private static final String UNCOMPRESSED_OUTPUT_PATTERN = "%s/%s/%s.csv";
     private static final String COMPRESSED_OUTPUT_PATTERN = "%s/%s/%s.csv.gz";
 
-    // TODO: use uncompress flag to optionally work with gzipped files
     public static void write(Map<String, Map<String, Set<String>>> parcelMap, Summarizer summarizer, String destDirPath) throws IOException {
         boolean compressed = !geogaddiOptions.isUncompress();
         if (!geogaddiOptions.isQuiet()) System.out.println("Writing to " + destDirPath);

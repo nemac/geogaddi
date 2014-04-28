@@ -7,8 +7,6 @@ public class TransformationOption {
     private String folder;
     private String file;
     private String normalDir;
-    private Integer dateIndex;
-    private Integer dataIndex;
     private String outName;
 
 
@@ -58,22 +56,6 @@ public class TransformationOption {
 
     public void setNormalDir(String normalDir) {
         this.normalDir = normalDir;
-    }
-
-    public Integer getDateIndex() {
-        return dateIndex;
-    }
-
-    public void setDateIndex(Integer dateIndex) {
-        this.dateIndex = dateIndex;
-    }
-
-    public Integer getDataIndex() {
-        return dataIndex;
-    }
-
-    public void setDataIndex(Integer dataIndex) {
-        this.dataIndex = dataIndex;
     }
 
     public String getOutName() {

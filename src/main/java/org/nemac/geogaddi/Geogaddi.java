@@ -73,9 +73,6 @@ public class Geogaddi extends GeogaddiOptionDriver {
 
             boolean quiet = geogaddiOptions.isQuiet();
 
-            // TODO: implement these
-            boolean existingSourcesFromIntegrator = geogaddiOptions.getParcelerOptions().isExistingFromIntegrator();
-
             List<String> csvSources = new ArrayList<String>();
 
             // TODO: make summarizer more sophisticated so as not to clobber the summary on using deriver only

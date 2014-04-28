@@ -1,6 +1,6 @@
 {
     "quiet": true,
-    "useAll": true,
+    "useAll": false,
     "uncompress": false,
     "fetcherOptions": {
         "enabled": false,
@@ -8,13 +8,12 @@
             "ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1900.csv.gz",
             "ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/by_year/1901.csv.gz"
         ],
-        "dumpDir": "test/data/dump"
+        "dumpDir": "data/dump"
     },
     "parcelerOptions": {
         "enabled": true,
         "cleanSource": false,
         "cleanDestination": false,
-        "existingFromIntegrator": true,
         "sourceCSVs": [
             "data/dump/1900.csv.gz",
             "data/dump/1901.csv.gz"
@@ -39,8 +38,6 @@
                 "folder": "transformationFolder",
                 "file": "PRCP",
                 "normalDir": "data/normals",
-                "dateIndex": 0,
-                "dataIndex": 1,
                 "outName": "PRCP_YTD"
             },
             {
@@ -50,8 +47,6 @@
                 "folder": "",
                 "file": "",
                 "normalDir": "",
-                "dateIndex": 0,
-                "dataIndex": 1,
                 "outName": "PRCP_YTD"
             },
             {
@@ -61,8 +56,6 @@
                 "folder": "",
                 "file": "",
                 "normalDir": "",
-                "dateIndex": 0,
-                "dataIndex": 1,
                 "outName": "PRCP_YTD"
             }
         ]
