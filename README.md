@@ -135,7 +135,7 @@ An executable JAR with dependencies will deploy to the target/ directory.
 	"integratorOptions": {
 		"enabled": false, // will use the integrator
 		"cleanSource": false, // currently unused,
-                "sourceDir": "data/output", // directory for output files to be transferred
+                 "sourceDir": "data/output", // directory for output files to be transferred
 		"awsAccessKeyId": "", // AWS access Key ID - see notes below
 		"awsSecretKey": "", // AWS secret key - see notes below
 		"bucketName": "" // AWS S3 bucket, will create if it doesn't exist; policies are not applied
