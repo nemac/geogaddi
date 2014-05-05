@@ -65,6 +65,18 @@ public class Summarizer {
         }
     }
     
+    public DataElement getElement(String folder, String file) {
+        if (summaryMap.containsKey(folder)) {
+            Map<String, DataElement> fileElement = summaryMap.get(folder);
+            
+            if (fileElement.containsKey(file)) {
+                return fileElement.get(file);
+            }
+        }
+        
+        return null;
+    }
+    
     public String jsonSummary() {
         JSONObject json = new JSONObject(summaryMap);
         return json.toString();

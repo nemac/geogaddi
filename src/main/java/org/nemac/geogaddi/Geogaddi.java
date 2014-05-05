@@ -102,7 +102,6 @@ public class Geogaddi extends GeogaddiOptionDriver {
 
                 for (String csvSource : csvSources) {
                     Map<String, Map<String, Set<String>>> parcelMap = Parceler.parcel(csvSource);
-
                     Writer.write(parcelMap, summarizer, destDirPath);
 
                     // clean up downloaded file

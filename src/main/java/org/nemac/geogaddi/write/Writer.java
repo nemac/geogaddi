@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.nemac.geogaddi.parcel.summary.DataElement;
 
 public class Writer extends GeogaddiOptionDriver {
     private static final String UNCOMPRESSED_OUTPUT_PATTERN = "%s/%s/%s.csv";
@@ -53,7 +54,8 @@ public class Writer extends GeogaddiOptionDriver {
                         } else {
                             if (hashedList.isEmpty()) {
                                 if (!geogaddiOptions.isQuiet()) System.out.println("... skipping " + destFile + " - all entries are duplicates");
-                                summarizer.setElement(folderEntry.getKey(), fileEntry.getKey(), Summarizer.getDataRange(sourceList, SummaryState.UNCHANGED));
+                                DataElement element = Summarizer.getDataRange(sourceList, SummaryState.UNCHANGED);
+                                summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), element.getMin(), element.getMax(), SummaryState.UNCHANGED);
                             } else {
                                 FileUtils.writeLines(useFile, hashedList, true);
                                 summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), sourceList.get(0).split(",")[0], hashedList.get(hashedList.size() - 1).split(",")[0], SummaryState.APPEND);
@@ -61,6 +63,9 @@ public class Writer extends GeogaddiOptionDriver {
                         }
                     } else {
                         FileUtils.writeLines(useFile, fileEntry.getValue());
+                        
+                        DataElement element = Summarizer.getDataRange(fileEntry.getValue(), SummaryState.NEW);
+                        summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), element.getMin(), element.getMax(), SummaryState.NEW);
                     }
                     
                     // write out file as gz and delete temp

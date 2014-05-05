@@ -2,6 +2,7 @@ package org.nemac.geogaddi.parcel.summary;
 
 public enum SummaryState {
     
+    OTHER(0),
     BACKLOG(1),
     UNCHANGED(2),
     APPEND(3),
