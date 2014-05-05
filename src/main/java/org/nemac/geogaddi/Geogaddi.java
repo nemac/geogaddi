@@ -95,7 +95,7 @@ public class Geogaddi extends GeogaddiOptionDriver {
 
                     if (cleanDestinationBeforeWrite && destDir.exists()) {
                         if (!quiet) System.out.println("Cleaning directory " + destDir.getPath());
-                                FileUtils.cleanDirectory(destDir);
+                        FileUtils.cleanDirectory(destDir);
                         if (!quiet) System.out.println("... directory cleaned");
                     }
                 }
@@ -114,8 +114,8 @@ public class Geogaddi extends GeogaddiOptionDriver {
 
             if (allEnabled || deriverEnabled) {
                 for (TransformationOption transformation : geogaddiOptions.getDeriverOptions().getTransformationOptions()) {
-                    Map<String, Map<String, Set<String>>> derived = Deriver.derive(transformation);
-                    Writer.write(derived, summarizer, destDirPath);
+                    // Map<String, Map<String, Set<String>>> derived = Deriver.derive(transformation);
+                    Deriver.derive(transformation, summarizer, destDirPath);
                 }
             }
 

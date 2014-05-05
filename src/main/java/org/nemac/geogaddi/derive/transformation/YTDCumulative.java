@@ -19,7 +19,7 @@ public class YTDCumulative extends AbstractTransformation {
 
             if (date.get(Calendar.DAY_OF_YEAR) == 1) {
                 runningCumulative = 0f;
-            }
+            }            
             
             runningCumulative += entry.getValue();
             transformedMap.put(entry.getKey(), runningCumulative);

@@ -14,15 +14,18 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.nemac.geogaddi.parcel.summary.Summarizer;
+import org.nemac.geogaddi.write.Writer;
 
 public class Deriver extends GeogaddiOptionDriver {
     private static final String LINE_FORMAT = "%s,%s";
     private static final String PATH_FORMAT = "%s/%s.%s";
     private static final DeriverOptions DERIVER_OPTIONS = geogaddiOptions.getDeriverOptions();
 
-    public static Map<String, Map<String, Set<String>>> derive(TransformationOption transformationOption) throws TransformationNotFoundException, IOException, ParseException {
+    public static void derive(TransformationOption transformationOption, Summarizer summarizer, String destDir) throws TransformationNotFoundException, IOException, ParseException {
         if (!geogaddiOptions.isQuiet()) System.out.println("Derived product being generated using " + transformationOption.getName());
-        Map<String, Map<String, Set<String>>> derivedMap = new TreeMap<>();
         
         AbstractTransformation transformation = TransformationFactory.createTransformation(transformationOption.getTransformationSourceLib(), transformationOption.getTransformation());
 
@@ -39,44 +42,50 @@ public class Deriver extends GeogaddiOptionDriver {
         Iterator<File> files = FileUtils.iterateFiles(new File(DERIVER_OPTIONS.getSourceDir()), extensions, true);
         
         while (files.hasNext()) {
-            File file = files.next();
-            
-            if (Utils.removeExtension(file.getName()).equals(transformationOption.getFile())) {
-                                
-                File useFile = file;
-                if (!geogaddiOptions.isUncompress()) { // is working with compressed files, so uncompress temporarily
-                    useFile = new File(Utils.uncompress(file.getCanonicalPath(), false));
-                }
-                                
-                String folder = FilenameUtils.getBaseName(useFile.getParent());
-                SortedMap<String, Float> dataPairs = linesToMap(FileUtils.readLines(useFile));
+            try {
+                File file = files.next();
                 
-                File normalFile = getNormalFile(transformationOption.getNormalDir(), folder, extensions[0]);
-
-                if (normalFile.exists()) { // only use if there is a corresponding normal                    
-                    if (!geogaddiOptions.isUncompress()) {
-                        normalFile = new File(Utils.uncompress(normalFile.getCanonicalPath(), false));
+                if (Utils.removeExtension(file.getName()).equals(transformationOption.getFile())) {
+                    Map<String, Map<String, Set<String>>> derivedMap = new TreeMap<>();
+                    
+                    File useFile = file;
+                    if (!geogaddiOptions.isUncompress()) { // is working with compressed files, so uncompress temporarily
+                        useFile = new File(Utils.uncompress(file.getCanonicalPath(), false));
                     }
                     
-                    SortedMap<String, Float> normalPairs = linesToMap(FileUtils.readLines(normalFile));
-                    SortedMap<String, Float> processedPairs = transformation.process(dataPairs, normalPairs);
+                    String folder = FilenameUtils.getBaseName(useFile.getParent());
+                    SortedMap<String, Float> dataPairs = linesToMap(FileUtils.readLines(useFile));
                     
-                    Map<String, Set<String>> subMap = new TreeMap<>();
-                    subMap.put(transformationOption.getOutName(),mapToLines(processedPairs));
-                    derivedMap.put(folder, subMap);
+                    File normalFile = getNormalFile(transformationOption.getNormalDir(), folder, extensions[0]);
                     
-                } else {
-                    if (!geogaddiOptions.isQuiet()) System.out.println("... normal file " + normalFile.getPath() + " was not found, derived product will not be generated");
-                }
-                
-                if (!geogaddiOptions.isUncompress()) {
-                    FileUtils.deleteQuietly(useFile);
-                    FileUtils.deleteQuietly(normalFile);
-                }
+                    if (normalFile.exists()) { // only use if there is a corresponding normal
+                        if (!geogaddiOptions.isUncompress()) {
+                            normalFile = new File(Utils.uncompress(normalFile.getCanonicalPath(), false));
+                        }
+                        
+                        SortedMap<String, Float> normalPairs = linesToMap(FileUtils.readLines(normalFile));
+                        SortedMap<String, Float> processedPairs = transformation.process(dataPairs, normalPairs);
+                        
+                        Map<String, Set<String>> subMap = new TreeMap<>();
+                        subMap.put(transformationOption.getOutName(),mapToLines(processedPairs));
+                        derivedMap.put(folder, subMap);
+                        
+                    } else {
+                        if (!geogaddiOptions.isQuiet()) System.out.println("... normal file " + normalFile.getPath() + " was not found, derived product will not be generated");
+                    }
+                    
+                    if (!geogaddiOptions.isUncompress()) {
+                        FileUtils.deleteQuietly(useFile);
+                        FileUtils.deleteQuietly(normalFile);
+                    }
+                    
+                    // write out
+                    Writer.write(derivedMap, summarizer, destDir);
+                } 
+            } catch (Exception ex) {
+                Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
-        return derivedMap;
     }
     
     // The normals are organized basically as the inverse of the data

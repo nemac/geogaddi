@@ -26,10 +26,12 @@ public abstract class AbstractTransformation {
         // normals date, used for date iteration transposition
         Calendar normalDate = Calendar.getInstance();
         normalDate.setTime(format.parse(defaults.firstKey()));
+        int year = normalDate.get(Calendar.YEAR);
         
         // start date, used as an incrementer
         Calendar runningDate = Calendar.getInstance();
         runningDate.setTime(format.parse(values.firstKey()));
+        
         if (runningDate.get(Calendar.DAY_OF_YEAR) != 1) {
             runningDate.set(Calendar.DAY_OF_YEAR, 1);
         }
@@ -44,15 +46,29 @@ public abstract class AbstractTransformation {
         while(endDate.after(runningDate)) {
             String key = format.format(runningDate.getTime());
             if (values.containsKey(key)) {
-                filledMap.put(key, values.get(key));
+                Float v = values.get(key);
+                if (v == null || v.isNaN()) {
+                    //System.out.println("Null value from data: " + runningDate.getTime());
+                    filledMap.put(key, 0f);
+                } else {
+                    filledMap.put(key, values.get(key));
+                }
+                
             } else {
                 // transpose day of year to normals
                 int d = runningDate.get(Calendar.DAY_OF_YEAR);
                 normalDate.set(Calendar.DAY_OF_YEAR, d);
+                normalDate.set(Calendar.YEAR, year);
                 String dt = format.format(normalDate.getTime());
                 
                 // get from normals map
-                filledMap.put(format.format(runningDate.getTime()), defaults.get(dt));
+                Float v = defaults.get(dt);
+                if (v == null || v.isNaN()) {
+                    //System.out.println("Null value from defaults: " + runningDate.getTime());
+                    filledMap.put(format.format(runningDate.getTime()), 0f);
+                } else {
+                    filledMap.put(format.format(runningDate.getTime()), defaults.get(dt));
+                }
             }
             
             runningDate.add(Calendar.DATE, 1);

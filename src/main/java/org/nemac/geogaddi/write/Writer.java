@@ -8,6 +8,8 @@ import org.nemac.geogaddi.parcel.summary.SummaryState;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Writer extends GeogaddiOptionDriver {
     private static final String UNCOMPRESSED_OUTPUT_PATTERN = "%s/%s/%s.csv";
@@ -21,48 +23,52 @@ public class Writer extends GeogaddiOptionDriver {
             Map<String, Set<String>> fileHash = folderEntry.getValue();
 
             for (Map.Entry<String, Set<String>> fileEntry : fileHash.entrySet()) {
-                File destFile = new File(String.format(UNCOMPRESSED_OUTPUT_PATTERN, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
-                destFile.getParentFile().mkdirs();
-                
-                File useFile = destFile;
-                if (compressed) { // need to uncompress to read
-                    File compressedFile = new File(String.format(COMPRESSED_OUTPUT_PATTERN, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
-                    if (compressedFile.exists()) {
-                        useFile = new File(Utils.uncompress(compressedFile.getCanonicalPath(), true));
-                    }
-                }
-                
-                if (destFile.exists()) {
-                    // scan and compare duplicate lines between the file and the hash
-                    List<String> sourceList = FileUtils.readLines(useFile);
-                    // remove duplicates from hash
-                    List<String> hashedList = new ArrayList<String>(fileEntry.getValue());
-                    hashedList.removeAll(sourceList);
-                                        
-                    // check last element of source list to see if it should come before new item hash
-                    if (!sourceList.isEmpty() && !hashedList.isEmpty() && sourceList.get(sourceList.size() - 1).compareTo(hashedList.get(0)) > 0) {
-                        if (!geogaddiOptions.isQuiet()) System.out.println("... backlog data detected, rebuilding output");
-                        Set<String> writeSet = new TreeSet<String>();
-                        writeSet.addAll(sourceList);
-                        writeSet.addAll(hashedList);
-                        FileUtils.writeLines(useFile, writeSet);
-                        summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), writeSet, SummaryState.BACKLOG);
-                    } else {
-                        if (hashedList.isEmpty()) {
-                            if (!geogaddiOptions.isQuiet()) System.out.println("... skipping " + destFile + " - all entries are duplicates");
-                            summarizer.setElement(folderEntry.getKey(), fileEntry.getKey(), Summarizer.getDataRange(sourceList, SummaryState.UNCHANGED));
-                        } else {
-                            FileUtils.writeLines(useFile, hashedList, true);
-                            summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), sourceList.get(0).split(",")[0], hashedList.get(hashedList.size() - 1).split(",")[0], SummaryState.APPEND);
+                try {
+                    File destFile = new File(String.format(UNCOMPRESSED_OUTPUT_PATTERN, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
+                    destFile.getParentFile().mkdirs();
+                    
+                    File useFile = destFile;
+                    if (compressed) { // need to uncompress to read
+                        File compressedFile = new File(String.format(COMPRESSED_OUTPUT_PATTERN, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
+                        if (compressedFile.exists()) {
+                            useFile = new File(Utils.uncompress(compressedFile.getCanonicalPath(), true));
                         }
                     }
-                } else {
-                    FileUtils.writeLines(useFile, fileEntry.getValue());
-                }
-                
-                // write out file as gz and delete temp
-                if (compressed) {
-                    Utils.compress(useFile.getCanonicalPath());
+                    
+                    if (destFile.exists()) {
+                        // scan and compare duplicate lines between the file and the hash
+                        List<String> sourceList = FileUtils.readLines(useFile);
+                        // remove duplicates from hash
+                        List<String> hashedList = new ArrayList<String>(fileEntry.getValue());
+                        hashedList.removeAll(sourceList);
+                        
+                        // check last element of source list to see if it should come before new item hash
+                        if (!sourceList.isEmpty() && !hashedList.isEmpty() && sourceList.get(sourceList.size() - 1).compareTo(hashedList.get(0)) > 0) {
+                            if (!geogaddiOptions.isQuiet()) System.out.println("... backlog data detected, rebuilding output");
+                            Set<String> writeSet = new TreeSet<String>();
+                            writeSet.addAll(sourceList);
+                            writeSet.addAll(hashedList);
+                            FileUtils.writeLines(useFile, writeSet);
+                            summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), writeSet, SummaryState.BACKLOG);
+                        } else {
+                            if (hashedList.isEmpty()) {
+                                if (!geogaddiOptions.isQuiet()) System.out.println("... skipping " + destFile + " - all entries are duplicates");
+                                summarizer.setElement(folderEntry.getKey(), fileEntry.getKey(), Summarizer.getDataRange(sourceList, SummaryState.UNCHANGED));
+                            } else {
+                                FileUtils.writeLines(useFile, hashedList, true);
+                                summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), sourceList.get(0).split(",")[0], hashedList.get(hashedList.size() - 1).split(",")[0], SummaryState.APPEND);
+                            }
+                        }
+                    } else {
+                        FileUtils.writeLines(useFile, fileEntry.getValue());
+                    }
+                    
+                    // write out file as gz and delete temp
+                    if (compressed) {
+                        Utils.compress(useFile.getCanonicalPath());
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
