@@ -42,11 +42,14 @@ public class Deriver extends GeogaddiOptionDriver {
             extensions = comExt;
         }
         
+        int count = 0;
+        
         Iterator<File> files = FileUtils.iterateFiles(new File(DERIVER_OPTIONS.getSourceDir()), extensions, true);
         
         while (files.hasNext()) {
             try {
                 File file = files.next();
+                count++;
                 
                 String station = Utils.removeExtension(file.getName());
                 
@@ -84,6 +87,7 @@ public class Deriver extends GeogaddiOptionDriver {
                             Set<String> lines = mapToLines(processedPairs);
                             
                             // write out
+                            if (!geogaddiOptions.isQuiet()) System.out.println("... writing " + folder + " : " + transformationOption.getOutName() + " #" + count);
                             FileUtils.writeLines(writeFile, lines);
                             summarizer.addElement(folder, transformationOption.getOutName(), lines, SummaryState.OTHER);
                             
@@ -100,7 +104,9 @@ public class Deriver extends GeogaddiOptionDriver {
                     if (!geogaddiOptions.isUncompress()) {
                         FileUtils.deleteQuietly(useFile);
                         FileUtils.deleteQuietly(normalFile);
-                        Utils.compress(writeFile.getCanonicalPath());
+                        if (writeFile.exists()) {
+                            Utils.compress(writeFile.getCanonicalPath());
+                        }
                     }
                 } 
             } catch (Exception ex) {

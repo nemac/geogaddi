@@ -53,15 +53,18 @@ public class Writer extends GeogaddiOptionDriver {
                             summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), writeSet, SummaryState.BACKLOG);
                         } else {
                             if (hashedList.isEmpty()) {
-                                if (!geogaddiOptions.isQuiet()) System.out.println("... skipping " + destFile + " - all entries are duplicates");
+                                // skip since most entries are duplicates
+                                //if (!geogaddiOptions.isQuiet()) System.out.println("... skipping " + destFile + " - all entries are duplicates");
                                 DataElement element = Summarizer.getDataRange(sourceList, SummaryState.UNCHANGED);
                                 summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), element.getMin(), element.getMax(), SummaryState.UNCHANGED);
                             } else {
+                                if (!geogaddiOptions.isQuiet()) System.out.println("... appending to " + useFile);
                                 FileUtils.writeLines(useFile, hashedList, true);
                                 summarizer.addElement(folderEntry.getKey(), fileEntry.getKey(), sourceList.get(0).split(",")[0], hashedList.get(hashedList.size() - 1).split(",")[0], SummaryState.APPEND);
                             }
                         }
                     } else {
+                        if (!geogaddiOptions.isQuiet()) System.out.println("... writing out " + useFile);
                         FileUtils.writeLines(useFile, fileEntry.getValue());
                         
                         DataElement element = Summarizer.getDataRange(fileEntry.getValue(), SummaryState.NEW);

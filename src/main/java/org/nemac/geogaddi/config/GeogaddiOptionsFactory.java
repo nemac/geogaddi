@@ -13,8 +13,8 @@ public class GeogaddiOptionsFactory {
         switch (managerType) {
             case JSON_PROPS:
                 return new JSONPropertiesDeserializer(propertiesSource).deserialize();
-            case JAVA_PROPS:
-                return new PropertiesToObject(propertiesSource).deserialize();
+//            case JAVA_PROPS:
+//                return new PropertiesToObject(propertiesSource).deserialize();
             default:
                 return null;
         }

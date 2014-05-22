@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class PropertiesToObject {
+/*    
+    
     private static final String DEFAULT_PROPERTIES_PATH = "geogaddi.properties";
 
     private final String propertiesSource;
@@ -153,5 +155,5 @@ public class PropertiesToObject {
             return aClass.getDeclaredConstructor(String.class);
         }
     }
-
+*/
 }

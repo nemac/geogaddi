@@ -38,10 +38,12 @@ public abstract class AbstractTransformation {
         
         // end date
         Calendar endDate = Calendar.getInstance();
+        /* This logic fills for entire years -- even beyond the current day
         endDate.setTime(format.parse(values.lastKey()));
         if (endDate.get(Calendar.DAY_OF_YEAR) != endDate.getActualMaximum(Calendar.DAY_OF_YEAR)) {
             endDate.set(Calendar.DAY_OF_YEAR, endDate.getActualMaximum(Calendar.DAY_OF_YEAR));
         }
+        */
         
         while(endDate.after(runningDate)) {
             String key = format.format(runningDate.getTime());
