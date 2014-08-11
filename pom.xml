@@ -46,11 +46,15 @@
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
+        <!-- This is a self-referential dependency and is not clear why it would
+             be needed or how it would ever work. The OS X version of Maven 
+             appears to not like this, so it has been commented out.
         <dependency>
             <groupId>org.nemac</groupId>
             <artifactId>geogaddi</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        -->
         <!--hamcrest-->
         <dependency>
             <groupId>org.hamcrest</groupId>
