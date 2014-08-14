@@ -1,11 +1,22 @@
 # Geogaddi
 
-Geogaddi is a command-line tool that parses and transforms CSV data. It separates out large CSV data aggregates sliced one way into many smaller CSVs sliced another way and to be used by client map applications asynchronously.
-Initially, Geogaddi has been built with retrieving and parsing GHCND data in mind.
-The GHCND source files are hundreds of individual files separated by year (going back to 1763) and are updated daily with the latest data.
-Usually only the current year file has data appended, but occasionally data may be revised from new models or missing values may be added.
-For the most recent years, each file is several gigabytes of data and therefore unusable by most clients.
-Moreover, each file contains all stations and all variables, when only a handful may be of relevence.
+Geogaddi is a command-line tool that downloads, parses, and transforms CSV data.   It it written
+for use with NEMAC's [Climate Explorer](https://github.com/nemac/climate-explorer) application,
+but it is a general purpose tool that can be used to automate the downloading and transformation
+of any CSV-formatted data set.
+
+The rest of this file contains general documentation for Geogaddi.  For specific instructions on
+how to set up Geogaddi for use with the [Climate Explorer](https://github.com/nemac/climate-explorer) application,
+see the file [ClimateExplorerSetup.md](https://github.com/nemac/geogaddi/blob/master/ClimateExplorerSetup.md).
+
+Geogaddi separates out large CSV data aggregates sliced one way into many smaller CSVs sliced
+another way and to be used by client map applications asynchronously.  Initially, Geogaddi has been
+built with retrieving and parsing GHCND data in mind.  The GHCND source files are hundreds of
+individual files separated by year (going back to 1763) and are updated daily with the latest data.
+Usually only the current year file has data appended, but occasionally data may be revised from new
+models or missing values may be added.  For the most recent years, each file is several gigabytes of
+data and therefore unusable by most clients.  Moreover, each file contains all stations and all
+variables, when only a handful may be of relevence.
 
 Geogaddi takes these large source files, filters them, and parcels them out into smaller aggregates that can span many years.
 
