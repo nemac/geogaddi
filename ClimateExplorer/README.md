@@ -50,13 +50,12 @@ Climate Explorer can access it in the same way that it accesses the GHCND data.
 
 The steps involved in setting up a Geogaddi instance to support Climate Explorer are as follows:
 
-* Download and compile Geogaddi to build the executable jar file
-* Initialize the Geogaddi output archive on a publicly visible web server
-* Edit the Geogaddi configuration files with the appropriate pathnames and/or other settings
-* Arrange to run Geogaddi as a cron job, or other regularly scheduled process, once each day
-* Configure the CORS authorization in your web server so that JavaScript clients may
-  download the file
-* Perform Annual Maintenance each January to update to the next year
+1. Download and compile Geogaddi to build the executable jar file
+2. Initialize the Geogaddi output archive on a publicly visible web server
+3. Edit the Geogaddi configuration files with the appropriate pathnames and/or other settings
+4. Arrange to run Geogaddi as a cron job, or other regularly scheduled process, once each day
+5. Configure the CORS authorization in your web server so that JavaScript clients may download the file
+6. Perform Annual Maintenance each January to update to the next year
 
 The following sections give more detailed instructions for each of these steps.
 
@@ -108,14 +107,14 @@ that actual JSON files cannot contain comments, so don't copy/paste this copy of
 
 Note also that Geogaddi is orgnized into four different components:
 
-1. the "fetcher", which handles downloading the original data file(s)
-2. the "parceler", which parses the file(s) downloaded by the fetcher and updates
-   the files in the archive with any new data
-3. the "deriver", which creates new elements from existing ones (this is the part
-   that creates the PRCP_YTD files from the PRCP files
-4. the "integrator", which uploads the resulting archive files, including any derived element
-   files, to Amazon S3.  Note that this last step is optional and is not needed if you are
-   hosting the files on your own server.
+* the "fetcher", which handles downloading the original data file(s)
+* the "parceler", which parses the file(s) downloaded by the fetcher and updates
+  the files in the archive with any new data
+* the "deriver", which creates new elements from existing ones (this is the part
+  that creates the PRCP_YTD files from the PRCP files
+* the "integrator", which uploads the resulting archive files, including any derived element
+  files, to Amazon S3.  Note that this last step is optional and is not needed if you are
+  hosting the files on your own server.
 
 ```json
 {
@@ -214,3 +213,6 @@ geogaddi-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
 
 ### 5. Configure the CORS authorization
+
+
+### 6. Perform Annual Maintenance each January to update to the next year
