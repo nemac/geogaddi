@@ -1,8 +1,8 @@
-### Geogaddi Climate Explorer Setup
+# Geogaddi Climate Explorer Setup
 
 ## Data Sets
 
-# GHCND
+### GHCND
 
 The [Climate Explorer](https://github.com/nemac/climate-explorer) application makes use of
 the GHCND data set from NCDC (ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily/readme.txt).  It relies
@@ -35,7 +35,7 @@ Geogaddi also takes care of generating the ytd precipitation files from the orig
 total (PRCP) files.
 
 
-# 2010 Normals Data
+### 2010 Normals Data
 
 Climate Explorer also makes use of NCDC's 2010 Normals product (ftp://ftp.ncdc.noaa.gov/pub/data/normals/1981-2010).
 This data should be stored in files of the form "NORMAL_ELEMENT_ID/STATION_ID.csv.gz", where NORMAL_ELEMENT is
@@ -60,7 +60,7 @@ The steps involved in setting up a Geogaddi instance to support Climate Explorer
 
 The following sections give more detailed instructions for each of these steps.
 
-# Download and Compile Geogaddi
+### Download and Compile Geogaddi
 
 The Geogaddi code can be obtained from Github: https://github.com/nemac/geogaddi.  It is written in Java
 and requires Maven for building.  To build it, just type "mvn install".  This doesn't actually install
@@ -68,7 +68,7 @@ anything outside the source directory --- it simply creates an executable jar fi
 
 Geogaddi requires Java 1.7 or higher.
 
-# Initialize the Geogaddi Output Archive
+### Initialize the Geogaddi Output Archive
 
 The point of Geogaddi is to maintain a collection of data files which store GHCND data in a particular structure.  Each day,
 when Geogaddi runs, it downloads the new GHCND data file from NCDC, and updates all the files in its collection with any
@@ -93,7 +93,7 @@ archive.  So, for example, the GHCND data for TMAX for station USC00012675 would
 "`ARCHIVE`/ghcnd/USC00012675/TMAX.csv.gz", and the TMAX normals data for that station would be
 in the file "`ARCHIVE`/normals/NORMAL_TMAX/USC00012675.csv.gz".
 
-# Edit the Geogaddi Configuration Files
+### Edit the Geogaddi Configuration Files
 
 Geogaddi is conrolled by settings in a JSON file.  This JSON contains all the details about which GHCND data
 file(s) to download from NCDC, the location of the archive of files to be maintained, which derived product
@@ -205,7 +205,7 @@ Note also that Geogaddi is orgnized into four different components:
 ```
 
 
-# Arrange to run Geogaddi as a Cron Job
+### Arrange to run Geogaddi as a Cron Job
 
 geogaddi-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
@@ -213,4 +213,4 @@ geogaddi-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
 
 
-# Configure the CORS authorization
+### Configure the CORS authorization
