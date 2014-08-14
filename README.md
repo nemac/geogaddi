@@ -7,7 +7,7 @@ of any CSV-formatted data set.
 
 The rest of this file contains general documentation for Geogaddi.  For specific instructions on
 how to set up Geogaddi for use with the [Climate Explorer](https://github.com/nemac/climate-explorer) application,
-see the file [ClimateExplorerSetup.md](https://github.com/nemac/geogaddi/blob/master/ClimateExplorerSetup.md).
+see the file [ClimateExplorer/README.md](https://github.com/nemac/geogaddi/blob/master/ClimateExplorer/README.md).
 
 Geogaddi separates out large CSV data aggregates sliced one way into many smaller CSVs sliced
 another way and to be used by client map applications asynchronously.  Initially, Geogaddi has been
