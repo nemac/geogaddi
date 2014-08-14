@@ -53,9 +53,10 @@ The steps involved in setting up a Geogaddi instance to support Climate Explorer
 1. Download and compile Geogaddi to build the executable jar file
 2. Initialize the Geogaddi output archive on a publicly visible web server
 3. Edit the Geogaddi configuration files with the appropriate pathnames and/or other settings
-4. Arrange to run Geogaddi as a cron job, or other regularly scheduled process, once each day
-5. Configure the CORS authorization in your web server so that JavaScript clients may download the file
-6. Perform Annual Maintenance each January to update to the next year
+4. Run Geogaddi manually to test it
+5. Arrange to run Geogaddi as a cron job, or other regularly scheduled process, once each day
+6. Configure the CORS authorization in your web server so that JavaScript clients may download the file
+7. Perform Annual Maintenance each January to update to the next year
 
 The following sections give more detailed instructions for each of these steps.
 
@@ -101,7 +102,7 @@ your daily Geogaddi cron job, you should prepare a copy of this configuration fi
 settings.
 
 You can start with the file
-[ghcnd.json](https://github.com/nemac/geogaddi/blob/master/ClimateExplorer/ghcnd.json).  Here is
+[ghcnd.json](https://github.com/nemac/geogaddi/blob/master/ClimateExplorer/ghcnd.json).  Below is
 an annotated copy of that file, with comments indicating the edits you might need to make.  Note
 that actual JSON files cannot contain comments, so don't copy/paste this copy of the file verbatim.
 
@@ -203,16 +204,58 @@ Note also that Geogaddi is orgnized into four different components:
 }
 ```
 
+In addition to a "ghcnd.json" file like the above, you will also need the CSV files "stations.csv" and "vars.csv"
+which give the GHCND station ids and variable ids to be stored.  You can get these files from the ClimateExplorer
+subdirectory of the Geogaddi source code.  Your "ghcnd.json" file should give the locations of these files
+in the "parcelerOptions.folderWhiteList" and "parcelerOptions.fileWhiteList" properties.
 
-### 4. Arrange to run Geogaddi as a Cron Job
+### 4. Run Geogaddi manually to test it
 
-geogaddi-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+To run Geogaddi manually, use a command like the following
+
+    java -jar .../geogaddi-0.0.1-SNAPSHOT-jar-with-dependencies.jar -j .../ghcnd.json
+    
+where the first `...` is the path of the directory containing the jar file, and the second `...` is
+the path of the directory containing your ghcnd.json file.  Note Geogaddi will interpret
+any relative paths inside the ghcnd.json relative to the directory where it is run.
+
+Run Geogaddi with the "quiet" option set to `false` to see messages about what it is doing and to confirm
+that it is correctly downloading and/or writing the desired files in the correct locations.  After you
+are confident that it is working correctly, you can change the "quiet" setting to `true`.
+
+
+### 5. Arrange to run Geogaddi as a Cron Job
+
+Once you are sure that everything is working as desired, set up a cron job to invoke Geogaddi
+once a day.
+
+
+### 6. Configure the CORS authorization
+
+Since Climate Explorer is a JavaScript application, it is subject to the usual cross-origin request restriction
+enforce by all browsers.  In order to accomodate this, the Geogaddi files on your web server need to be
+configured so that the server adds the appropriate CORS header line to the file.  On an Apache web server
+this involves putting someting like the following in your Apache config file, or in a ".htaccess" that applies
+to the directory tree containing the files:
+
+    Header set Access-Control-Allow-Origin "*"
+    
+For more details on configuring CORS on your server, see http://enable-cors.org.    
+
+
+### 7. Perform Annual Maintenance each January to update to the next year
+
+Notice that the sample ghcnd.json file above has the filename of the 2014 GHCND data file
+hardwired into it (in two places).  Each year when January 1 rolls around, you'll need to update
+this filename to the next year.
+
+Furthermore, for a period of a few (2-4?) weeks after January 1 each year, it's best to configure
+Geogaddi to download and process the data files for both the current year's data, and
+the previous year's, because the previous year's data file will continue to change a bit
+at the beginning of the month, as it gets fleshed out with late-arriving data.  So, during this
+time, set the "fetcherOptions.sources" and "parcelerOptions.sourceCSVs" lists to contain
+both the current year and the previous year's file (separated by a comma).  After 2-4 weeks (?) it
+should be safe to remove the previous year's file.
 
 
 
-
-
-### 5. Configure the CORS authorization
-
-
-### 6. Perform Annual Maintenance each January to update to the next year
