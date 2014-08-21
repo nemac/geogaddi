@@ -15,7 +15,7 @@
         "cleanDestination": false,
         "existingFromIntegrator": false,
         "sourceCSVs": [
-            "data/dump/2014.csv.gz"
+            "data/tmp/2014.csv.gz"
         ],
         "folderWhiteList": "stations.csv",
         "folderWhiteListIndex": 0,
