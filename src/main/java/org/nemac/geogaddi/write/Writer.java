@@ -17,13 +17,20 @@ public class Writer extends GeogaddiOptionDriver {
     private static final String COMPRESSED_OUTPUT_PATTERN = "%s/%s/%s.csv.gz";
 
     public static void write(Map<String, Map<String, Set<String>>> parcelMap, Summarizer summarizer, String destDirPath) throws IOException {
-        boolean compressed = !geogaddiOptions.isUncompress();
+       boolean compressed = !geogaddiOptions.isUncompress();
         if (!geogaddiOptions.isQuiet()) System.out.println("Writing to " + destDirPath);
 
         for (Map.Entry<String, Map<String, Set<String>>> folderEntry : parcelMap.entrySet()) {
+            /* folderEntry is now a single key/value pair from the parcelMap map.
+             *     - the key [folderEntry.getKey()] is the station id
+             *     - the value [folderEntry.getValue()] is another map, whose keys
+             *       are variable ids, and whose values are the set of data for that variable */
             Map<String, Set<String>> fileHash = folderEntry.getValue();
-
             for (Map.Entry<String, Set<String>> fileEntry : fileHash.entrySet()) {
+                /* fileEntry is now a single key/value pair from the folderEntry.getValue()
+                 * value above.
+                 *  - the key [fileEntry.getKey()] is the variable id
+                 *  - the value [fileEntry.getValue()] is the set of data for that variable */
                 try {
                     File destFile = new File(String.format(UNCOMPRESSED_OUTPUT_PATTERN, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
                     destFile.getParentFile().mkdirs();
@@ -32,8 +39,16 @@ public class Writer extends GeogaddiOptionDriver {
                     if (compressed) { // need to uncompress to read
                         File compressedFile = new File(String.format(COMPRESSED_OUTPUT_PATTERN, destDirPath, folderEntry.getKey(), fileEntry.getKey()));
                         if (compressedFile.exists()) {
-                            useFile = new File(Utils.uncompress(compressedFile.getCanonicalPath(), true));
+                            if (!geogaddiOptions.isQuiet()) System.out.println("  reading: " + compressedFile);
+                            try {
+                                useFile = new File(Utils.uncompress(compressedFile.getCanonicalPath(), true));
+                            } catch (Exception e) {
+                                System.out.println("Error reading file: " + compressedFile);
+                                throw e;
+                            }
                         }
+                    } else {
+                        if (!geogaddiOptions.isQuiet()) System.out.println("  reading: " + useFile);
                     }
                     
                     if (destFile.exists()) {
